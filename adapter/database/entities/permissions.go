@@ -1,6 +1,9 @@
 package entities
 
-import "github.com/javiorfo/fiber-micro/application/domain/model"
+import (
+	"github.com/javiorfo/fiber-micro/application/domain/model"
+	"github.com/javiorfo/steams"
+)
 
 type PermissionDB struct {
 	ID    uint     `json:"id" gorm:"primaryKey;autoIncrement"`
@@ -12,13 +15,22 @@ func (PermissionDB) TableName() string {
 	return "permissions"
 }
 
-func (permDb *PermissionDB) From(perm model.Permission) {
-	permDb.ID = perm.ID
-	permDb.Name = perm.Name
+func (permDB *PermissionDB) From(perm model.Permission) {
+	permDB.ID = perm.ID
+	permDB.Name = perm.Name
+	permDB.Roles = steams.Mapping(steams.OfSlice(perm.Roles), func(role model.Role) RoleDB {
+		var roleDB RoleDB
+		roleDB.From(role)
+		return roleDB
+	}).Collect()
 }
 
-func (permDb PermissionDB) Into() model.Permission {
+func (permDB PermissionDB) Into() model.Permission {
 	return model.Permission{
-		Name: permDb.Name,
+		ID:   permDB.ID,
+		Name: permDB.Name,
+		Roles: steams.Mapping(steams.OfSlice(permDB.Roles), func(roleDB RoleDB) model.Role {
+			return roleDB.Into()
+		}).Collect(),
 	}
 }

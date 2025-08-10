@@ -23,21 +23,21 @@ func (UserDB) TableName() string {
 	return "users"
 }
 
-func (userDb *UserDB) From(user model.User) {
-	userDb.ID = user.ID
-	userDb.Username = user.Username
-	userDb.Email = user.Email
-	userDb.Status = user.Status
-	userDb.Permission.From(user.Permission)
+func (userDB *UserDB) From(user model.User) {
+	userDB.ID = user.ID
+	userDB.Username = user.Username
+	userDB.Email = user.Email
+	userDB.Status = user.Status
+	userDB.Permission.From(user.Permission)
 }
 
-func (userDb UserDB) Into() model.User {
+func (userDB UserDB) Into() model.User {
 	return model.User{
-		ID:       userDb.ID,
-		Code:     userDb.Code,
-		Username: userDb.Username,
-		Email:    userDb.Email,
-		Status:   userDb.Status,
+		ID:       userDB.ID,
+		Code:     userDB.Code,
+		Username: userDB.Username,
+		Email:    userDB.Email,
+		Status:   userDB.Status,
 	}
 }
 

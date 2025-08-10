@@ -1,6 +1,6 @@
 # Variables
 APP_NAME = fiber-micro
-VERSION = 0.0.1
+VERSION = 0.1.0
 MAIN_DIR = cmd
 BIN_DIR = bin
 
@@ -38,6 +38,12 @@ docker: test build
 	@$(RM) main
 	@echo "$(APP_NAME):$(VERSION) image created!"
 
+.PHONY: format
+format:
+	@echo "Formatting..."
+	@gofmt -w .
+	@echo "Done!"
+
 .PHONY: info
 info:
 	@echo "PROJECT INFO:"
@@ -58,7 +64,6 @@ install:
 migrate:
 	@echo "Running database schema migration..."
 	@go run adapter/database/migrator/main.go
-	@echo "Done!"
 
 .PHONY: run
 run:

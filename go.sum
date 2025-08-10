@@ -38,6 +38,10 @@ github.com/jackc/puddle/v2 v2.2.1 h1:RhxXJtFG022u4ibrCSMSiu5aOq1i77R3OHKNJj77OAk
 github.com/jackc/puddle/v2 v2.2.1/go.mod h1:vriiEXHvEE654aYKXXjOvZM39qJ0q+azkZFrfEOc3H4=
 github.com/javiorfo/go-microservice-lib v0.0.0-20250526152431-223951055a2d h1:oVUsg/n4H29dTT0Pvl4Kc1JIaNVQImTKTp+o7MhDeO4=
 github.com/javiorfo/go-microservice-lib v0.0.0-20250526152431-223951055a2d/go.mod h1:R0JXgcAOsUlbotOoGKX7cyoeNSljTy3JP76nvu3N40U=
+github.com/javiorfo/nilo v1.0.1 h1:2dugqnLO4CoH98oRbdwHW66lVnQ4LNofBYQAU6prL7s=
+github.com/javiorfo/nilo v1.0.1/go.mod h1:cJBBOCqyc+87XmxDyJrenoIfhUkjsb07RRyNZOMJe90=
+github.com/javiorfo/steams v1.4.0 h1:GhU8lgokz7UgrJlsB5iUmNT4JH2ajZw2w8g0rUxLXKA=
+github.com/javiorfo/steams v1.4.0/go.mod h1:ZvBYBG87ux4sNNvwM7W9b4lQoDFIxERMgaJZGEH01mk=
 github.com/jinzhu/inflection v1.0.0 h1:K317FqzuhWc8YvSVlFMCCUb36O/S9MCKRDI7QkRKD/E=
 github.com/jinzhu/inflection v1.0.0/go.mod h1:h+uFLlag+Qp1Va5pdKtLDYj+kHp5pxUVkryuEj+Srlc=
 github.com/jinzhu/now v1.1.5 h1:/o9tlHleP7gOFmsnYNz3RGnqzefHA47wQpKrrdTIwXQ=

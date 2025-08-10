@@ -1,4 +1,4 @@
-package ports
+package port
 
 import (
 	"context"
@@ -10,14 +10,14 @@ import (
 
 type UserRepository interface {
 	FindByCode(ctx context.Context, code uuid.UUID) (*model.User, error)
-	FindByUsername(username string) (*model.User, error)
+	FindByUsername(ctx context.Context, username string) (*model.User, error)
 	FindAll(ctx context.Context, page pagination.Page, info string) ([]model.User, error)
-	Create(ctx context.Context, user *model.User, auditor string) error
+	Create(ctx context.Context, user *model.User) error
 }
 
 type UserService interface {
 	FindByCode(ctx context.Context, code uuid.UUID) (*model.User, error)
 	FindAll(ctx context.Context, page pagination.Page, info string) ([]model.User, error)
-	Create(user *model.User, auditor string) (*string, error)
+	Create(user *model.User) (*string, error)
 	Login(username, password string) (string, error)
 }

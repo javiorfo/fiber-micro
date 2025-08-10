@@ -95,6 +95,7 @@ help:
 	@echo "  make build    - Build the application"
 	@echo "  make clean    - Clean build artifacts"
 	@echo "  make docker   - Create Docker image"
+	@echo "  make format   - Runs gofmt command"
 	@echo "  make help     - Show this help message"
 	@echo "  make info     - Print Info"
 	@echo "  make install  - Install libraries"

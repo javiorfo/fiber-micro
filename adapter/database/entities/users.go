@@ -29,15 +29,25 @@ func (userDB *UserDB) From(user model.User) {
 	userDB.Email = user.Email
 	userDB.Status = user.Status
 	userDB.Permission.From(user.Permission)
+
+	if user.LastModifiedBy == nil {
+		userDB.Auditable = *auditory.New(user.CreatedBy)
+	} else {
+		userDB.Auditable.Update(user.LastModifiedBy)
+	}
 }
 
-func (userDB UserDB) Into() model.User {
-	return model.User{
-		ID:       userDB.ID,
-		Code:     userDB.Code,
-		Username: userDB.Username,
-		Email:    userDB.Email,
-		Status:   userDB.Status,
+func (userDB UserDB) Into() *model.User {
+	return &model.User{
+		ID:             userDB.ID,
+		Code:           userDB.Code,
+		Username:       userDB.Username,
+		Email:          userDB.Email,
+		Status:         userDB.Status,
+		CreatedBy:      userDB.CreatedBy,
+		CreateDate:     userDB.CreateDate,
+		LastModifiedBy: userDB.LastModifiedBy,
+		LastModified:   userDB.LastModified,
 	}
 }
 

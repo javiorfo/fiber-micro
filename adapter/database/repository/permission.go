@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/javiorfo/fiber-micro/adapter/database/entities"
@@ -37,4 +38,24 @@ func (repository *permissionRepository) Create(ctx context.Context, perm *model.
 	*perm = permDB.Into()
 
 	return nil
+}
+
+func (repository *permissionRepository) FindByName(ctx context.Context, name string) (*model.Permission, error) {
+	ctx, span := repository.tracer.Start(ctx, tracing.Name())
+	defer span.End()
+
+	var permDB entities.PermissionDB
+	result := repository.WithContext(ctx).Find(&permDB, "name = ?", name)
+
+	if err := result.Error; err != nil {
+		return nil, err
+	}
+
+	if result.RowsAffected == 0 {
+		return nil, errors.New("User not found")
+	}
+
+	permission := permDB.Into()
+
+	return &permission, nil
 }

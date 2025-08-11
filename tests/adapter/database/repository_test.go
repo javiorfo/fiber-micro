@@ -27,7 +27,8 @@ func TestDatabase(t *testing.T) {
 		t.Fatalf("Failed to insert permission: %v", err)
 	}
 
-	user := model.NewUser("Javi", "javi@mail.com", *permission, "1234", "auditor")
+	password := "1234"
+	user := model.NewUser("Javi", "javi@mail.com", *permission, password, "auditor")
 
 	if err := userRepo.Create(ctx, &user); err != nil {
 		t.Fatalf("Failed to insert record: %v", err)
@@ -47,12 +48,12 @@ func TestDatabase(t *testing.T) {
 	}
 
 	// User inserts to test pagination
-	user2 := model.NewUser("Carlos", "carlos@mail.com", *permission, "1234", "auditor")
+	user2 := model.NewUser("Carlos", "carlos@mail.com", *permission, password, "auditor")
 	if err := userRepo.Create(ctx, &user2); err != nil {
 		t.Fatalf("Failed to insert record: %v", err)
 	}
 
-	user3 := model.NewUser("Lionel", "lionel@mail.com", *permission, "1234", "auditor")
+	user3 := model.NewUser("Lionel", "lionel@mail.com", *permission, password, "auditor")
 	if err := userRepo.Create(ctx, &user3); err != nil {
 		t.Fatalf("Failed to insert record: %v", err)
 	}
@@ -63,6 +64,6 @@ func TestDatabase(t *testing.T) {
 	}
 
 	if len(users) == 0 {
-		t.Errorf("Expected '1', got '%d'", len(users))
+		t.Error("Expected '1', got '0'")
 	}
 }

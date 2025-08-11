@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/javiorfo/go-microservice-lib/security"
 	"github.com/javiorfo/go-microservice-lib/validation"
 )
 
@@ -15,6 +16,7 @@ type User struct {
 	Permission     Permission `json:"permission"`
 	Status         UserStatus `json:"status"`
 	Password       string     `json:"-"`
+	Salt           string     `json:"-"`
 	CreatedBy      string     `json:"-"`
 	LastModifiedBy *string    `json:"-"`
 	CreateDate     time.Time  `json:"-"`
@@ -29,6 +31,11 @@ func NewUser(username string, email string, permission Permission, password stri
 		Password:   password,
 		CreatedBy:  createdBy,
 	}
+}
+
+func (u User) VerifyPassword(password string) bool {
+	hashedInputPassword := security.Hash(password, u.Salt)
+	return hashedInputPassword == u.Password
 }
 
 type UserStatus = string

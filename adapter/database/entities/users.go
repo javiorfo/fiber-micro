@@ -35,6 +35,8 @@ func (userDB *UserDB) From(user model.User) {
 	userDB.Username = user.Username
 	userDB.Email = user.Email
 	userDB.Status = user.Status
+	userDB.Password = user.Password
+	userDB.Salt = user.Salt
 	userDB.Permission.From(user.Permission)
 
 	if user.LastModifiedBy == nil {
@@ -51,17 +53,14 @@ func (userDB UserDB) Into() model.User {
 		Username:       userDB.Username,
 		Email:          userDB.Email,
 		Status:         userDB.Status,
+		Password:       userDB.Password,
+		Salt:           userDB.Salt,
 		CreatedBy:      userDB.CreatedBy,
 		CreateDate:     userDB.CreateDate,
 		LastModifiedBy: userDB.LastModifiedBy,
 		LastModified:   userDB.LastModifiedDate,
 	}
 }
-
-/* func (u UserEntity) VerifyPassword(password string) bool {
-	hashedInputPassword := pwd.Hash(password, u.Salt)
-	return hashedInputPassword == u.Password
-} */
 
 type userFilter struct {
 	Username       string `filter:"username = ?"`

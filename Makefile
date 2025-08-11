@@ -81,12 +81,17 @@ swagger:
 .PHONY: test
 test:
 	@echo "Running tests..."
-	@go test -v ./tests/*
+	@go test -v ./tests/...
 
 .PHONY: test-database
 test-database:
 	@echo "Running tests..."
 	@go test -v ./tests/adapter/database/...
+
+.PHONY: test-service
+test-service:
+	@echo "Running tests..."
+	@go test -v ./tests/application/domain/service/...
 
 .PHONY: tidy
 tidy:

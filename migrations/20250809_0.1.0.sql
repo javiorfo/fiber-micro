@@ -1,11 +1,11 @@
 create table permissions (
     id serial primary key,
-    name text not null
+    name text unique not null
 );
 
 create table roles (
     id serial primary key,
-    name text not null
+    name text unique not null
 );
 
 create table permissions_roles (
@@ -18,11 +18,16 @@ create table permissions_roles (
 
 create table users (
     id serial primary key,
+    code uuid not null,
     username text not null,
     email text not null,
     password text not null,
     salt text not null,
     status text not null,
+    created_by text not null,
+    last_modified_by text null,
+    create_date date not null,
+    last_modified_date date not null,
     permission_id integer not null,
     foreign key(permission_id) references permissions(id)
 );

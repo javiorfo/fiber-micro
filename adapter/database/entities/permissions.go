@@ -6,9 +6,9 @@ import (
 )
 
 type PermissionDB struct {
-	ID    uint     `json:"id" gorm:"primaryKey;autoIncrement"`
-	Name  string   `json:"name" gorm:"unique"`
-	Roles []RoleDB `json:"roles" gorm:"many2many:permissions_roles;"`
+	ID    uint     `gorm:"primaryKey;autoIncrement"`
+	Name  string   `gorm:"unique"`
+	Roles []RoleDB `gorm:"many2many:permissions_roles;foreignKey:ID;joinForeignKey:permission_id;references:ID;joinReferences:role_id"`
 }
 
 func (PermissionDB) TableName() string {

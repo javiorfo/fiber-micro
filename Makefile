@@ -83,6 +83,11 @@ test:
 	@echo "Running tests..."
 	@go test -v ./tests/*
 
+.PHONY: test-database
+test-database:
+	@echo "Running tests..."
+	@go test -v ./tests/adapter/database/...
+
 .PHONY: tidy
 tidy:
 	@echo "Running go mod tidy..."

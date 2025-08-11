@@ -10,7 +10,6 @@ const (
 	AppName        = "fiber-micro"
 	AppPort        = ":8080"
 	AppContextPath = "/app"
-	TokenAudience  = "https://something.com.ar"
 )
 
 var DBDataConnection = connection.DBDataConnection{

@@ -17,16 +17,16 @@ import (
 	"gorm.io/gorm"
 )
 
-type dummyRepository struct {
+type userRepository struct {
 	*gorm.DB
 	tracer trace.Tracer
 }
 
-func NewDummyRepository(db *gorm.DB) port.UserRepository {
-	return &dummyRepository{DB: db, tracer: otel.Tracer(tracing.Name())}
+func NewUserRepository(db *gorm.DB) port.UserRepository {
+	return &userRepository{DB: db, tracer: otel.Tracer(tracing.Name())}
 }
 
-func (repository *dummyRepository) Create(ctx context.Context, user *model.User) error {
+func (repository *userRepository) Create(ctx context.Context, user *model.User) error {
 	ctx, span := repository.tracer.Start(ctx, tracing.Name())
 	defer span.End()
 
@@ -35,26 +35,24 @@ func (repository *dummyRepository) Create(ctx context.Context, user *model.User)
 
 	result := repository.DB.WithContext(ctx).Create(&userDB)
 	if err := result.Error; err != nil {
-		return fmt.Errorf("Error creating dummy %v", err)
+		return fmt.Errorf("Error creating user %v", err)
 	}
 
-	user = userDB.Into()
+	*user = userDB.Into()
 
 	return nil
 }
 
-func (repository *dummyRepository) FindAll(ctx context.Context, page pagination.Page, info string) ([]model.User, error) {
+func (repository *userRepository) FindAll(ctx context.Context, queryFilter pagination.QueryFilter) ([]model.User, error) {
 	ctx, span := repository.tracer.Start(ctx, tracing.Name())
 	defer span.End()
 
 	var usersDB []entities.UserDB
-	filter := repository.WithContext(ctx).
-		Offset(page.Page - 1).
-		Limit(page.Size).
-		Order(fmt.Sprintf("%s %s", page.SortBy, page.SortOrder))
+	filter := repository.WithContext(ctx)
 
-	if info != "" {
-		filter = filter.Where("info = ?", info)
+	filter, err := queryFilter.Filter(filter)
+	if err != nil {
+		return nil, err
 	}
 
 	results := filter.Find(&usersDB)
@@ -64,13 +62,13 @@ func (repository *dummyRepository) FindAll(ctx context.Context, page pagination.
 	}
 
 	users := steams.Mapping(steams.OfSlice(usersDB), func(userDB entities.UserDB) model.User {
-		return *userDB.Into()
+		return userDB.Into()
 	}).Collect()
 
 	return users, nil
 }
 
-func (repository *dummyRepository) FindByCode(ctx context.Context, code uuid.UUID) (*model.User, error) {
+func (repository *userRepository) FindByCode(ctx context.Context, code uuid.UUID) (*model.User, error) {
 	ctx, span := repository.tracer.Start(ctx, tracing.Name())
 	defer span.End()
 
@@ -85,10 +83,12 @@ func (repository *dummyRepository) FindByCode(ctx context.Context, code uuid.UUI
 		return nil, errors.New("User not found")
 	}
 
-	return userDB.Into(), nil
+	user := userDB.Into()
+
+	return &user, nil
 }
 
-func (repository *dummyRepository) FindByUsername(ctx context.Context, username string) (*model.User, error) {
+func (repository *userRepository) FindByUsername(ctx context.Context, username string) (*model.User, error) {
 	ctx, span := repository.tracer.Start(ctx, tracing.Name())
 	defer span.End()
 
@@ -103,5 +103,7 @@ func (repository *dummyRepository) FindByUsername(ctx context.Context, username 
 		return nil, errors.New("User not found")
 	}
 
-	return userDB.Into(), nil
+	user := userDB.Into()
+
+	return &user, nil
 }

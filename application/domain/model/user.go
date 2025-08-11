@@ -13,7 +13,7 @@ type User struct {
 	Username       string     `json:"username"`
 	Email          string     `json:"email"`
 	Permission     Permission `json:"permission"`
-	Status         Status     `json:"status"`
+	Status         UserStatus `json:"status"`
 	Password       string     `json:"-"`
 	CreatedBy      string     `json:"-"`
 	LastModifiedBy *string    `json:"-"`
@@ -21,12 +21,25 @@ type User struct {
 	LastModified   *time.Time `json:"-"`
 }
 
-type Status = string
+func NewUser(username string, email string, permission Permission, password string, createdBy string) User {
+	return User{
+		Username:   username,
+		Email:      email,
+		Permission: permission,
+		Password:   password,
+		CreatedBy:  createdBy,
+	}
+}
+
+type UserStatus = string
 
 const (
-	active   Status = "ACTIVE"
-	inactive Status = "INACTIVE"
-	blocked  Status = "BLOCKED"
+	active   UserStatus = "ACTIVE"
+	inactive UserStatus = "INACTIVE"
+	blocked  UserStatus = "BLOCKED"
 )
 
-var ValidateStatus = validation.NewEnumValidator("status", "status", active, inactive, blocked)
+var ValidateStatus = validation.NewEnumValidator(
+	validation.Tag("status"),
+	validation.JsonField("status"),
+	active, inactive, blocked)

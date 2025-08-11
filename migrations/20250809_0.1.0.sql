@@ -1,3 +1,8 @@
+drop table if exists users;
+drop table if exists permissions_roles;
+drop table if exists permissions;
+drop table if exists roles;
+
 create table permissions (
     id serial primary key,
     name text unique not null
@@ -25,9 +30,9 @@ create table users (
     salt text not null,
     status text not null,
     created_by text not null,
-    last_modified_by text null,
+    last_modified_by text,
     create_date date not null,
-    last_modified_date date not null,
+    last_modified_date date,
     permission_id integer not null,
     foreign key(permission_id) references permissions(id)
 );

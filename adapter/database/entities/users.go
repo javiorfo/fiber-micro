@@ -65,7 +65,7 @@ func (userDB UserDB) Into() model.User {
 
 type userFilter struct {
 	Username       string `filter:"username = ?"`
-	PermissionName string `filter:"Permission.name = ?"`
+	PermissionName string `filter:"permissions.name = ?"`
 	CreateDate     string `filter:"create_date = ?;type:time.Time"`
 	pagination.Page
 }

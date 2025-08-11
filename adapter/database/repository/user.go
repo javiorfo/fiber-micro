@@ -43,14 +43,15 @@ func (repository *userRepository) Create(ctx context.Context, user *model.User) 
 	return nil
 }
 
-func (repository *userRepository) FindAll(ctx context.Context, queryFilter pagination.QueryFilter) ([]model.User, error) {
+func (repository *userRepository) FindAll(ctx context.Context, gormFilter pagination.GormFilter) ([]model.User, error) {
 	ctx, span := repository.tracer.Start(ctx, tracing.Name())
 	defer span.End()
 
 	var usersDB []entities.UserDB
-	filter := repository.WithContext(ctx)
+	filter := repository.WithContext(ctx).
+		Joins("INNER JOIN permissions ON users.permission_id = permissions.id")
 
-	filter, err := queryFilter.Filter(filter)
+	filter, err := gormFilter.Filter(filter)
 	if err != nil {
 		return nil, err
 	}

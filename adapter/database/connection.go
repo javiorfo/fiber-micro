@@ -1,7 +1,9 @@
-package connection
+package database
 
 import (
 	"fmt"
+	"os"
+	"strconv"
 	"time"
 
 	"github.com/gofiber/fiber/v2/log"
@@ -11,18 +13,18 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-type DBDataConnection struct {
-	Url         string
-	ShowSQLInfo bool
-}
-
 var DBinstance *gorm.DB
 
-func (db DBDataConnection) Connect() error {
-	dsn := fmt.Sprintf("%s?sslmode=disable", db.Url)
+func Connect() error {
+	dsn := fmt.Sprintf("%s?sslmode=disable", os.Getenv("DATABASE_URL"))
+
+	isShowSQLInfo, err := strconv.ParseBool(os.Getenv("SHOW_SQL_INFO"))
+	if err != nil {
+		return fmt.Errorf("Could not parse SHOW_SQL_INFO var %v", err)
+	}
 
 	loggerSQL := logger.Default.LogMode(logger.Info)
-	if !db.ShowSQLInfo {
+	if !isShowSQLInfo {
 		loggerSQL = logger.Discard
 	}
 

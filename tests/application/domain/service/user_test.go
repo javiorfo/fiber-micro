@@ -33,15 +33,17 @@ func TestMain(m *testing.M) {
 	os.Exit(exitCode)
 }
 
-func TestUserCreate(t *testing.T) {
-	userRepo := new(mocks.MockUserRepository)
-	permRepo := new(mocks.MockPermissionRepository)
-	userService := service.NewUserService(userRepo, permRepo)
+var userRepo = new(mocks.MockUserRepository)
+var permRepo = new(mocks.MockPermissionRepository)
+var userService = service.NewUserService(userRepo, permRepo)
 
+func TestUserCreate(t *testing.T) {
 	username := "javi"
 	password := "1234"
 	salt, _ := security.GenerateSalt()
 	hashed := security.Hash(password, salt)
+
+	t.Logf("Hashed password %s, salt %s", hashed, salt)
 
 	user := &model.User{
 		Code:     uuid.New(),
@@ -64,15 +66,11 @@ func TestUserCreate(t *testing.T) {
 
 	assert.True(t, ok)
 	assert.NotNil(t, resp)
-	assert.Equal(t, resp.Errors[0].Code, response.ErrorCode("FIBER-MICRO-003"))
+	assert.Equal(t, resp.Get().Code, response.ErrorCode("FIBER-MICRO-003"))
 	userRepo.AssertExpectations(t)
 }
 
 func TestUserFindAll(t *testing.T) {
-	userRepo := new(mocks.MockUserRepository)
-	permRepo := new(mocks.MockPermissionRepository)
-	userService := service.NewUserService(userRepo, permRepo)
-
 	queryFilter := entities.NewUserFilter(pagination.DefaultPage(), "Javi", "", "")
 	expected := []model.User{
 		{ID: 1},

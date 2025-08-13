@@ -49,6 +49,7 @@ func (repository *userRepository) FindAll(ctx context.Context, queryFilter pagin
 
 	var usersDB []entities.UserDB
 	filter := repository.WithContext(ctx).
+		Preload("Permission.Roles").
 		Joins("INNER JOIN permissions ON users.permission_id = permissions.id")
 
 	filter, err := queryFilter.Filter(filter)
@@ -94,7 +95,9 @@ func (repository *userRepository) FindByUsername(ctx context.Context, username s
 	defer span.End()
 
 	var userDB entities.UserDB
-	result := repository.WithContext(ctx).Find(&userDB, "username = ?", username)
+	result := repository.WithContext(ctx).
+		Preload("Permission.Roles").
+		Find(&userDB, "username = ?", username)
 
 	if err := result.Error; err != nil {
 		return nil, err

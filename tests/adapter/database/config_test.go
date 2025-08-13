@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/javiorfo/fiber-micro/adapter/database/migrator/tables"
+	"github.com/javiorfo/fiber-micro/adapter/database/migrator/scripts"
 	"github.com/javiorfo/fiber-micro/adapter/database/repository"
 	"github.com/javiorfo/fiber-micro/application/port"
 	"github.com/testcontainers/testcontainers-go"
@@ -25,7 +25,7 @@ func TestMain(m *testing.M) {
 	ctx := context.Background()
 
 	req := testcontainers.ContainerRequest{
-		Image:        "postgres:latest",
+		Image:        "postgres:17",
 		ExposedPorts: []string{"5432/tcp"},
 		Env: map[string]string{
 			"POSTGRES_USER":     "testuser",
@@ -59,7 +59,7 @@ func TestMain(m *testing.M) {
 		log.Fatalf("Failed to connect to database: %s", err)
 	}
 
-	tables.Migrate(db, "../../../migrations")
+	scripts.Migrate(db, "../../../migrations")
 
 	userRepo = repository.NewUserRepository(db)
 	roleRepo = repository.NewRoleRepository(db)

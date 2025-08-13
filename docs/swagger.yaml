@@ -1,0 +1,139 @@
+basePath: /app
+definitions:
+  model.Permission:
+    properties:
+      name:
+        type: string
+      roles:
+        items:
+          $ref: '#/definitions/model.Role'
+        type: array
+    type: object
+  model.Role:
+    properties:
+      name:
+        type: string
+    type: object
+  model.User:
+    properties:
+      code:
+        type: string
+      email:
+        type: string
+      permission:
+        $ref: '#/definitions/model.Permission'
+      status:
+        $ref: '#/definitions/model.UserStatus'
+      username:
+        type: string
+    type: object
+  model.UserStatus:
+    enum:
+    - ACTIVE
+    - INACTIVE
+    - BLOCKED
+    type: string
+    x-enum-varnames:
+    - UserStatusActive
+    - UserStatusInactive
+    - UserStatusBlocked
+  response.Error:
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+    type: object
+  response.Pagination:
+    properties:
+      pageNumber:
+        type: integer
+      pageSize:
+        type: integer
+      total:
+        type: integer
+    type: object
+  response.PaginationResponse-model_User:
+    properties:
+      elements:
+        items:
+          $ref: '#/definitions/model.User'
+        type: array
+      pagination:
+        $ref: '#/definitions/response.Pagination'
+    type: object
+  response.ResponseError:
+    properties:
+      errors:
+        items:
+          $ref: '#/definitions/response.Error'
+        type: array
+    type: object
+info:
+  contact:
+    email: fiber@swagger.io
+    name: API Support
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+paths:
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of users with pagination
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Size per page
+        in: query
+        name: size
+        type: integer
+      - description: Sort by field
+        in: query
+        name: sortBy
+        type: string
+      - description: Sort order (asc or desc)
+        in: query
+        name: sortOrder
+        type: string
+      - description: Username filter
+        in: header
+        name: username
+        type: string
+      - description: Permission Name filter
+        in: header
+        name: permissions.name
+        type: string
+      - description: Creation date filter
+        in: header
+        name: createDate
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Paginated list of dummies
+          schema:
+            $ref: '#/definitions/response.PaginationResponse-model_User'
+        "400":
+          description: Invalid query parameters
+          schema:
+            $ref: '#/definitions/response.ResponseError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.ResponseError'
+      security:
+      - OAuth2Password: []
+      summary: List all users
+      tags:
+      - users
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

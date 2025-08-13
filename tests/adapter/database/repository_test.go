@@ -47,6 +47,10 @@ func TestDatabase(t *testing.T) {
 		t.Errorf("Expected name to be '1', got '%d'", userResult.ID)
 	}
 
+	if userResult.Permission.Name != "PERM" {
+		t.Errorf("Expected Permission Name to be 'PERM', got '%v'", userResult.Permission)
+	}
+
 	// User inserts to test pagination
 	user2 := model.NewUser("Carlos", "carlos@mail.com", *permission, password, "auditor")
 	if err := userRepo.Create(ctx, &user2); err != nil {

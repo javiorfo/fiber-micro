@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 
+	"github.com/gofiber/fiber/v2/log"
 	"github.com/javiorfo/fiber-micro/application/domain/model"
 	"github.com/javiorfo/fiber-micro/application/domain/service/errors"
 	"github.com/javiorfo/fiber-micro/application/port"
@@ -82,6 +83,8 @@ func (service *userService) Login(ctx context.Context, username string, password
 func (service *userService) FindAll(ctx context.Context, filter pagination.QueryFilter) ([]model.User, error) {
 	_, span := service.tracer.Start(ctx, tracing.Name())
 	defer span.End()
+
+	log.Infof("%sFilter %+v", tracing.Log(span), filter)
 
 	return service.userRepository.FindAll(ctx, filter)
 }

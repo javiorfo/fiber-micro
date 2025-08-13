@@ -75,7 +75,6 @@ swagger:
 	@echo "Creating swagger api..."
 	@swag init --parseDependency
 	@swag fmt
-	@go run docs/cmd/replace.go
 	@echo "Done!"
 
 .PHONY: test
@@ -83,15 +82,20 @@ test:
 	@echo "Running tests..."
 	@go test -v ./tests/...
 
-.PHONY: test-database
+.PHONY: test-repository
 test-database:
-	@echo "Running tests..."
+	@echo "Running repository tests..."
 	@go test -v ./tests/adapter/database/...
 
 .PHONY: test-service
 test-service:
-	@echo "Running tests..."
+	@echo "Running service tests..."
 	@go test -v ./tests/application/domain/service/...
+
+.PHONY: test-handlers
+test-handlers:
+	@echo "Running handlers tests..."
+	@go test -v ./tests/adapter/http/handlers/...
 
 .PHONY: tidy
 tidy:

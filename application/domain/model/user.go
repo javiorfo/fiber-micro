@@ -30,6 +30,7 @@ func NewUser(username string, email string, permission Permission, password stri
 		Permission: permission,
 		Password:   password,
 		CreatedBy:  createdBy,
+		Status:     UserStatusActive,
 	}
 }
 
@@ -41,12 +42,12 @@ func (u User) VerifyPassword(password string) bool {
 type UserStatus = string
 
 const (
-	active   UserStatus = "ACTIVE"
-	inactive UserStatus = "INACTIVE"
-	blocked  UserStatus = "BLOCKED"
+	UserStatusActive   UserStatus = "ACTIVE"
+	UserStatusInactive UserStatus = "INACTIVE"
+	UserStatusBlocked  UserStatus = "BLOCKED"
 )
 
 var ValidateStatus = validation.NewEnumValidator(
 	validation.Tag("status"),
 	validation.JsonField("status"),
-	active, inactive, blocked)
+	UserStatusActive, UserStatusInactive, UserStatusBlocked)

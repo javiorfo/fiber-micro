@@ -9,15 +9,15 @@ import (
 )
 
 type UserDB struct {
-	ID           uint      `gorm:"primaryKey;autoIncrement"`
-	Code         uuid.UUID `gorm:"not null"`
-	Username     string    `gorm:"not null"`
-	Email        string    `gorm:"not null"`
-	PermissionID uint      `gorm:"not null"`
-	Permission   PermissionDB
-	Password     string `gorm:"not null"`
-	Salt         string `gorm:"not null"`
-	Status       string `gorm:"not null"`
+	ID           uint         `gorm:"primaryKey;autoIncrement"`
+	Code         uuid.UUID    `gorm:"not null"`
+	Username     string       `gorm:"not null"`
+	Email        string       `gorm:"not null"`
+	PermissionID uint         `gorm:"not null"`
+	Permission   PermissionDB `gorm:"column:permission_id;not null"`
+	Password     string       `gorm:"not null"`
+	Salt         string       `gorm:"not null"`
+	Status       string       `gorm:"not null"`
 	auditory.Auditable
 }
 
@@ -59,13 +59,14 @@ func (userDB UserDB) Into() model.User {
 		CreateDate:     userDB.CreateDate,
 		LastModifiedBy: userDB.LastModifiedBy,
 		LastModified:   userDB.LastModifiedDate,
+		Permission:     userDB.Permission.Into(),
 	}
 }
 
 type userFilter struct {
-	Username       string `filter:"username = ?"`
+	Username       string `filter:"users.username = ?"`
 	PermissionName string `filter:"permissions.name = ?"`
-	CreateDate     string `filter:"create_date = ?;type:time.Time"`
+	CreateDate     string `filter:"create_date > ?;type:time.Time"`
 	pagination.Page
 }
 

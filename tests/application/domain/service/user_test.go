@@ -13,6 +13,7 @@ import (
 	"github.com/javiorfo/go-microservice-lib/pagination"
 	"github.com/javiorfo/go-microservice-lib/response"
 	"github.com/javiorfo/go-microservice-lib/security"
+	"github.com/javiorfo/nilo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -38,6 +39,34 @@ var permRepo = new(mocks.MockPermissionRepository)
 var userService = service.NewUserService(userRepo, permRepo)
 
 func TestUserCreate(t *testing.T) {
+	ctx := context.Background()
+	perm := model.Permission{
+		ID:    1,
+		Name:  "PERM",
+		Roles: []model.Role{{ID: 1, Name: "ROLE_1"}},
+	}
+	permRepo.On("FindByName", ctx, mock.Anything).Return(nilo.Of(perm), nil)
+
+	user := model.User{
+		ID:        1,
+		Code:      uuid.New(),
+		Username:  "Javi",
+		Email:     "mail",
+		Password:  "1234",
+		Status:    "ACTIVE",
+		CreatedBy: "auditor",
+	}
+
+	userRepo.On("Create", ctx, &user).Return(nil)
+
+	backErr := userService.Create(ctx, &user, perm.Name)
+
+	assert.Nil(t, backErr)
+	userRepo.AssertExpectations(t)
+	permRepo.AssertExpectations(t)
+}
+
+func TestUserLogin(t *testing.T) {
 	username := "javi"
 	password := "1234"
 	salt, _ := security.GenerateSalt()
@@ -45,7 +74,7 @@ func TestUserCreate(t *testing.T) {
 
 	t.Logf("Hashed password %s, salt %s", hashed, salt)
 
-	user := &model.User{
+	user := model.User{
 		Code:     uuid.New(),
 		Username: username,
 		Password: hashed,
@@ -53,7 +82,7 @@ func TestUserCreate(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	userRepo.On("FindByUsername", ctx, mock.Anything).Return(user, nil)
+	userRepo.On("FindByUsername", ctx, mock.Anything).Return(nilo.Of(user), nil)
 
 	token, backendErr := userService.Login(ctx, username, password)
 

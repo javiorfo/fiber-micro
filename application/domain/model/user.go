@@ -27,9 +27,9 @@ func NewUser(username string, email string, permission Permission, password stri
 	return User{
 		Username:   username,
 		Email:      email,
-		Permission: permission,
 		Password:   password,
 		CreatedBy:  createdBy,
+		Permission: permission,
 		Status:     UserStatusActive,
 	}
 }

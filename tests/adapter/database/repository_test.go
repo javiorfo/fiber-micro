@@ -34,21 +34,22 @@ func TestDatabase(t *testing.T) {
 		t.Fatalf("Failed to insert record: %v", err)
 	}
 
+	// Find by Username
 	userResult, err := userRepo.FindByUsername(ctx, user.Username)
 	if err != nil {
 		t.Fatalf("Failed to query record: %v", err)
 	}
 
-	if userResult.CreatedBy != "auditor" {
-		t.Errorf("Expected name to be 'auditor', got '%s'", userResult.CreatedBy)
+	if userResult.Get().CreatedBy != "auditor" {
+		t.Errorf("Expected name to be 'auditor', got '%s'", userResult.Get().CreatedBy)
 	}
 
-	if userResult.ID != 1 {
-		t.Errorf("Expected name to be '1', got '%d'", userResult.ID)
+	if userResult.Get().ID != 1 {
+		t.Errorf("Expected name to be '1', got '%d'", userResult.Get().ID)
 	}
 
-	if userResult.Permission.Name != "PERM" {
-		t.Errorf("Expected Permission Name to be 'PERM', got '%v'", userResult.Permission)
+	if userResult.Get().Permission.Name != "PERM" {
+		t.Errorf("Expected Permission Name to be 'PERM', got '%v'", userResult.Get().Permission)
 	}
 
 	// User inserts to test pagination
@@ -62,12 +63,44 @@ func TestDatabase(t *testing.T) {
 		t.Fatalf("Failed to insert record: %v", err)
 	}
 
-	users, err := userRepo.FindAll(ctx, entities.NewUserFilter(pagination.DefaultPage(), "Javi", "PERM", ""))
+	// Find all
+	filter := entities.NewUserFilter(pagination.DefaultPage(), "Javi", "PERM", "")
+	users, err := userRepo.FindAll(ctx, filter)
 	if err != nil {
 		t.Fatalf("Failed to execute findAll: %v", err)
 	}
 
 	if len(users) == 0 {
 		t.Error("Expected '1', got '0'")
+	}
+
+	count, err := userRepo.Count(ctx, filter)
+	if err != nil {
+		t.Fatalf("Failed to execute count: %v", err)
+	}
+
+	if count == 0 {
+		t.Error("Expected '1', got '0'")
+	}
+
+	// Diff filter and page against count
+	page, _ := pagination.NewPage("1", "1", "id", "asc")
+	filter = entities.NewUserFilter(*page, "", "", "")
+	users, err = userRepo.FindAll(ctx, filter)
+	if err != nil {
+		t.Fatalf("Failed to execute findAll: %v", err)
+	}
+
+	if len(users) != 1 {
+		t.Errorf("Expected '1', got %d", len(users))
+	}
+
+	count, err = userRepo.Count(ctx, filter)
+	if err != nil {
+		t.Fatalf("Failed to execute count: %v", err)
+	}
+
+	if count != 3 {
+		t.Errorf("Expected '3', got %d", count)
 	}
 }

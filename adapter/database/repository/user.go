@@ -11,6 +11,7 @@ import (
 	"github.com/javiorfo/fiber-micro/application/port"
 	"github.com/javiorfo/go-microservice-lib/pagination"
 	"github.com/javiorfo/go-microservice-lib/tracing"
+	"github.com/javiorfo/nilo"
 	"github.com/javiorfo/steams"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
@@ -52,7 +53,7 @@ func (repository *userRepository) FindAll(ctx context.Context, queryFilter pagin
 		Preload("Permission.Roles").
 		Joins("INNER JOIN permissions ON users.permission_id = permissions.id")
 
-	filter, err := queryFilter.Filter(filter)
+	filter, err := queryFilter.PaginateAndFilter(filter)
 	if err != nil {
 		return nil, err
 	}
@@ -68,6 +69,30 @@ func (repository *userRepository) FindAll(ctx context.Context, queryFilter pagin
 	}).Collect()
 
 	return users, nil
+}
+
+func (repository *userRepository) Count(ctx context.Context, queryFilter pagination.QueryFilter) (int64, error) {
+	ctx, span := repository.tracer.Start(ctx, tracing.Name())
+	defer span.End()
+
+	filter := repository.WithContext(ctx).
+		Model(entities.UserDB{}).
+		Preload("Permission.Roles").
+		Joins("INNER JOIN permissions ON users.permission_id = permissions.id")
+
+	filter, err := queryFilter.FilterOnly(filter)
+	if err != nil {
+		return 0, err
+	}
+
+	var count int64
+	results := filter.Count(&count)
+
+	if err := results.Error; err != nil {
+		return 0, err
+	}
+
+	return count, nil
 }
 
 func (repository *userRepository) FindByCode(ctx context.Context, code uuid.UUID) (*model.User, error) {
@@ -90,7 +115,7 @@ func (repository *userRepository) FindByCode(ctx context.Context, code uuid.UUID
 	return &user, nil
 }
 
-func (repository *userRepository) FindByUsername(ctx context.Context, username string) (*model.User, error) {
+func (repository *userRepository) FindByUsername(ctx context.Context, username string) (nilo.Optional[model.User], error) {
 	ctx, span := repository.tracer.Start(ctx, tracing.Name())
 	defer span.End()
 
@@ -100,14 +125,14 @@ func (repository *userRepository) FindByUsername(ctx context.Context, username s
 		Find(&userDB, "username = ?", username)
 
 	if err := result.Error; err != nil {
-		return nil, err
+		return nilo.Empty[model.User](), err
 	}
 
 	if result.RowsAffected == 0 {
-		return nil, errors.New("User not found")
+		return nilo.Empty[model.User](), nil
 	}
 
 	user := userDB.Into()
 
-	return &user, nil
+	return nilo.Of(user), nil
 }

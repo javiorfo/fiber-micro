@@ -37,11 +37,54 @@ definitions:
     - UserStatusActive
     - UserStatusInactive
     - UserStatusBlocked
+  request.CreateUserRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      permission:
+        type: string
+      status:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - password
+    - permission
+    - status
+    - username
+    type: object
+  request.LoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  response.CreateUserResponse:
+    properties:
+      user:
+        $ref: '#/definitions/model.User'
+    type: object
   response.Error:
     properties:
       code:
         type: string
       message:
+        type: string
+    type: object
+  response.LoginResponse:
+    properties:
+      message:
+        type: string
+      token:
+        type: string
+      username:
         type: string
     type: object
   response.Pagination:
@@ -127,8 +170,71 @@ paths:
           schema:
             $ref: '#/definitions/response.ResponseError'
       security:
-      - OAuth2Password: []
+      - BearerAuth: []
       summary: List all users
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: Create a new user with the provided information
+      parameters:
+      - description: Dummy information
+        in: body
+        name: dummy
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.CreateUserResponse'
+        "400":
+          description: Invalid request body or validation errors
+          schema:
+            $ref: '#/definitions/response.ResponseError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.ResponseError'
+      security:
+      - BearerAuth: []
+      summary: Create a new user
+      tags:
+      - users
+  /users/login:
+    post:
+      consumes:
+      - application/json
+      description: Login a user and return a JWT token
+      parameters:
+      - description: Username and password
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/request.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.LoginResponse'
+        "400":
+          description: Invalid request body or validation errors
+          schema:
+            $ref: '#/definitions/response.ResponseError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.ResponseError'
+      security:
+      - BearerAuth: []
+      summary: Login user
       tags:
       - users
 securityDefinitions:

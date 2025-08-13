@@ -1,9 +1,0 @@
-~[BASE]~
-url http://localhost:8080/app/users
-method GET
-
-~[HEADERS]~
-Content-Type application/json
-Accept application/json
-username javi
-

@@ -83,7 +83,7 @@ test:
 	@go test -v ./tests/...
 
 .PHONY: test-repository
-test-database:
+test-repository:
 	@echo "Running repository tests..."
 	@go test -v ./tests/adapter/database/...
 
@@ -106,15 +106,18 @@ tidy:
 .PHONY: help
 help:
 	@echo "Makefile commands:"
-	@echo "  make build    - Build the application"
-	@echo "  make clean    - Clean build artifacts"
-	@echo "  make docker   - Create Docker image"
-	@echo "  make format   - Runs gofmt command"
-	@echo "  make help     - Show this help message"
-	@echo "  make info     - Print Info"
-	@echo "  make install  - Install libraries"
-	@echo "  make migrate  - Migrate database schema"
-	@echo "  make run      - Run the application"
-	@echo "  make swagger  - Create swagger api"
-	@echo "  make test     - Run tests"
-	@echo "  make tidy     - Run go mod tidy"
+	@echo "  make build           - Build the application"
+	@echo "  make clean           - Clean build artifacts"
+	@echo "  make docker          - Create Docker image"
+	@echo "  make format          - Runs gofmt command"
+	@echo "  make help            - Show this help message"
+	@echo "  make info            - Print Info"
+	@echo "  make install         - Install libraries"
+	@echo "  make migrate         - Migrate database schema"
+	@echo "  make run             - Run the application"
+	@echo "  make swagger         - Create swagger api"
+	@echo "  make test            - Run tests"
+	@echo "  make test-repository - Run repository tests only"
+	@echo "  make test-service    - Run service tests only"
+	@echo "  make test-handlers   - Run handlers tests only"
+	@echo "  make tidy            - Run go mod tidy"

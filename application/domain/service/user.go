@@ -34,34 +34,51 @@ func (service *userService) Create(ctx context.Context, user *model.User, permNa
 	_, span := service.tracer.Start(ctx, tracing.Name())
 	defer span.End()
 
-	permission, err := service.permRepository.FindByName(ctx, permName)
+	permissionOpt, err := service.permRepository.FindByName(ctx, permName)
 	if err != nil {
+		return backend.InternalError(span, err)
+	}
+
+	if permissionOpt.IsPresent() {
+		user.Permission = permissionOpt.Get()
+	} else {
 		return errors.PermissionNotFound(span)
 	}
 
 	salt, err := security.GenerateSalt()
 	if err != nil {
-		return backend.GenericError(span, err)
+		return backend.InternalError(span, err)
 	}
 
 	hashedPassword := security.Hash(user.Password, salt)
-
-	// Set user values
-	user.Permission = *permission
 	user.Password = hashedPassword
 	user.Salt = salt
 
-	return backend.GenericError(span, service.userRepository.Create(ctx, user))
+	log.Infof("%sHashed password created!", tracing.Log(span))
+	span.AddEvent("Hashed password created!")
+
+	err = service.userRepository.Create(ctx, user)
+	if err != nil {
+		return backend.InternalError(span, err)
+	}
+
+	return nil
 }
 
 func (service *userService) Login(ctx context.Context, username string, password string) (string, backend.Error) {
 	_, span := service.tracer.Start(ctx, tracing.Name())
 	defer span.End()
 
-	user, err := service.userRepository.FindByUsername(ctx, username)
+	userOpt, err := service.userRepository.FindByUsername(ctx, username)
 	if err != nil {
+		return "", backend.InternalError(span, err)
+	}
+
+	if userOpt.IsEmpty() {
 		return "", errors.UserNotFound(span)
 	}
+
+	user := userOpt.Get()
 
 	if user.VerifyPassword(password) {
 		roles := steams.OfSlice(user.Permission.Roles).MapToString(func(r model.Role) string {
@@ -72,7 +89,7 @@ func (service *userService) Login(ctx context.Context, username string, password
 
 		token, err := security.CreateToken(tokenPermission, username)
 		if err != nil {
-			return "", backend.GenericError(span, err)
+			return "", backend.InternalError(span, err)
 		}
 		return token, nil
 	}
@@ -87,4 +104,11 @@ func (service *userService) FindAll(ctx context.Context, filter pagination.Query
 	log.Infof("%sFilter %+v", tracing.Log(span), filter)
 
 	return service.userRepository.FindAll(ctx, filter)
+}
+
+func (service *userService) Count(ctx context.Context, filter pagination.QueryFilter) (int64, error) {
+	_, span := service.tracer.Start(ctx, tracing.Name())
+	defer span.End()
+
+	return service.userRepository.Count(ctx, filter)
 }

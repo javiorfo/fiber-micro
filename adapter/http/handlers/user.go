@@ -2,11 +2,17 @@ package handlers
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
 	"github.com/javiorfo/fiber-micro/adapter/database/entities"
+	"github.com/javiorfo/fiber-micro/adapter/http/request"
+	srvResponse "github.com/javiorfo/fiber-micro/adapter/http/response"
+	"github.com/javiorfo/fiber-micro/application/domain/model"
 	"github.com/javiorfo/fiber-micro/application/port"
 	"github.com/javiorfo/go-microservice-lib/pagination"
 	"github.com/javiorfo/go-microservice-lib/response"
+	"github.com/javiorfo/go-microservice-lib/security"
 	"github.com/javiorfo/go-microservice-lib/tracing"
+	"github.com/javiorfo/go-microservice-lib/validation"
 	"go.opentelemetry.io/otel"
 )
 
@@ -26,8 +32,8 @@ import (
 // @Failure		400					{object}	response.ResponseError					"Invalid query parameters"
 // @Failure		500					{object}	response.ResponseError					"Internal server error"
 // @Router			/users [get]
-// @Security		OAuth2Password
-func FindAllUsers(ds port.UserService) fiber.Handler {
+// @Security		BearerAuth
+func FindAllUsers(service port.UserService) fiber.Handler {
 	tracer := otel.Tracer(tracing.Name())
 	return func(c *fiber.Ctx) error {
 		ctx, span := tracer.Start(c.UserContext(), c.Path())
@@ -48,17 +54,99 @@ func FindAllUsers(ds port.UserService) fiber.Handler {
 				}))
 		}
 
-		users, err := ds.FindAll(ctx, entities.NewUserFilter(*page,
+		filter := entities.NewUserFilter(*page,
 			c.Get("username"),
 			c.Get("permissions.name"),
 			c.Get("createDate"),
-		))
+		)
 
+		users, err := service.FindAll(ctx, filter)
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).
 				JSON(response.InternalServerError(span, response.Message(err.Error())))
 		}
 
-		return c.JSON(response.NewPaginationResponse(pagination.Paginator(*page, len(users)), users))
+		count, err := service.Count(ctx, filter)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).
+				JSON(response.InternalServerError(span, response.Message(err.Error())))
+		}
+
+		return c.JSON(response.NewPaginationResponse(pagination.Paginator(*page, count), users))
+	}
+}
+
+// @Summary		Create a new user
+// @Description	Create a new user with the provided information
+// @Tags			users
+// @Accept			json
+// @Produce		json
+// @Param			dummy	body		request.CreateUserRequest	true	"Dummy information"
+// @Success		201		{object}	response.CreateUserResponse
+// @Failure		400		{object}	response.ResponseError	"Invalid request body or validation errors"
+// @Failure		500		{object}	response.ResponseError	"Internal server error"
+// @Router			/users [post]
+// @Security		BearerAuth
+func CreateUser(service port.UserService) fiber.Handler {
+	tracer := otel.Tracer(tracing.Name())
+	return func(c *fiber.Ctx) error {
+		ctx, span := tracer.Start(c.UserContext(), c.Path())
+		defer span.End()
+
+		userRequest, errResp := validation.ValidateRequest[request.CreateUserRequest](c, span,
+			"FIBER-MICRO-006",
+			request.ValidateUserNotBlank("FIBER-MICRO-007"),
+			model.ValidateStatus("FIBER-MICRO-008"),
+		)
+
+		if errResp != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(errResp)
+		}
+
+		log.Infof("%sReceived user: %+v", tracing.Log(span), userRequest)
+
+		user := userRequest.Into(security.GetTokenUsername(c))
+		if err := service.Create(ctx, &user, userRequest.Permission); err != nil {
+			return err.ToResponse(c)
+		}
+
+		return c.Status(fiber.StatusCreated).JSON(srvResponse.CreateUserResponse{User: user})
+	}
+}
+
+// @Summary		Login user
+// @Description	Login a user and return a JWT token
+// @Tags			users
+// @Accept			json
+// @Produce		json
+// @Param			user	body		request.LoginRequest	true	"Username and password"
+// @Success		201		{object}	response.LoginResponse
+// @Failure		400		{object}	response.ResponseError	"Invalid request body or validation errors"
+// @Failure		500		{object}	response.ResponseError	"Internal server error"
+// @Router			/users/login [post]
+// @Security		BearerAuth
+func Login(service port.UserService) fiber.Handler {
+	tracer := otel.Tracer(tracing.Name())
+	return func(c *fiber.Ctx) error {
+		ctx, span := tracer.Start(c.UserContext(), c.Path())
+		defer span.End()
+
+		loginReq, errResp := validation.ValidateRequest[request.LoginRequest](c, span,
+			"FIBER-MICRO-009",
+			request.ValidateUserNotBlank("FIBER-MICRO-010"),
+		)
+		if errResp != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(errResp)
+		}
+
+		log.Infof("%s Received credentials: %+v", tracing.Log(span), loginReq)
+
+		token, err := service.Login(ctx, loginReq.Username, loginReq.Password)
+
+		if err != nil {
+			return err.ToResponse(c)
+		}
+
+		return c.Status(fiber.StatusCreated).JSON(srvResponse.NewLoginResponse(loginReq.Username, token))
 	}
 }

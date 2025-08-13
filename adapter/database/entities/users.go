@@ -70,8 +70,12 @@ type userFilter struct {
 	pagination.Page
 }
 
-func (uf userFilter) Filter(db *gorm.DB) (*gorm.DB, error) {
-	return pagination.Builder(db, uf.Page, uf)
+func (uf userFilter) PaginateAndFilter(db *gorm.DB) (*gorm.DB, error) {
+	return pagination.PaginateAndFilter(db, uf.Page, uf)
+}
+
+func (uf userFilter) FilterOnly(db *gorm.DB) (*gorm.DB, error) {
+	return pagination.FilterOnly(db, uf)
 }
 
 func NewUserFilter(page pagination.Page, username, permissionName, createDate string) *userFilter {

@@ -2,13 +2,13 @@ package repository
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/javiorfo/fiber-micro/adapter/database/entities"
 	"github.com/javiorfo/fiber-micro/application/domain/model"
 	"github.com/javiorfo/fiber-micro/application/port"
 	"github.com/javiorfo/go-microservice-lib/tracing"
+	"github.com/javiorfo/nilo"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
 	"gorm.io/gorm"
@@ -40,7 +40,7 @@ func (repository *permissionRepository) Create(ctx context.Context, perm *model.
 	return nil
 }
 
-func (repository *permissionRepository) FindByName(ctx context.Context, name string) (*model.Permission, error) {
+func (repository *permissionRepository) FindByName(ctx context.Context, name string) (nilo.Optional[model.Permission], error) {
 	ctx, span := repository.tracer.Start(ctx, tracing.Name())
 	defer span.End()
 
@@ -48,14 +48,14 @@ func (repository *permissionRepository) FindByName(ctx context.Context, name str
 	result := repository.WithContext(ctx).Find(&permDB, "name = ?", name)
 
 	if err := result.Error; err != nil {
-		return nil, err
+		return nilo.Empty[model.Permission](), err
 	}
 
 	if result.RowsAffected == 0 {
-		return nil, errors.New("User not found")
+		return nilo.Empty[model.Permission](), nil
 	}
 
 	permission := permDB.Into()
 
-	return &permission, nil
+	return nilo.Of(permission), nil
 }

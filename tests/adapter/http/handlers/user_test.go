@@ -15,6 +15,7 @@ import (
 	srvResp "github.com/javiorfo/fiber-micro/adapter/http/response"
 	"github.com/javiorfo/fiber-micro/adapter/http/routes"
 	"github.com/javiorfo/fiber-micro/application/domain/model"
+	be "github.com/javiorfo/fiber-micro/application/domain/service/errors"
 	"github.com/javiorfo/fiber-micro/tests/mocks"
 	"github.com/javiorfo/go-microservice-lib/pagination"
 	"github.com/javiorfo/go-microservice-lib/response"
@@ -36,6 +37,59 @@ func TestMain(m *testing.M) {
 	routes.User(app, mockSecurity, mockUserService)
 
 	os.Exit(m.Run())
+}
+
+func TestLogin(t *testing.T) {
+	tracer := otel.Tracer("Login")
+	ctx, span := tracer.Start(context.Background(), "mockpath")
+	defer span.End()
+
+	loginReq := request.LoginRequest{
+		Username: "javi",
+		Password: "12334",
+	}
+
+	t.Run("Successful", func(t *testing.T) {
+		mockUserService.ExpectedCalls = nil
+		mockUserService.On("Login", ctx, mock.Anything, mock.Anything).Return("token", nil)
+
+		body, _ := json.Marshal(loginReq)
+		req := httptest.NewRequest(fiber.MethodPost, "/users/login", bytes.NewBuffer(body))
+		req.Header.Set("Content-Type", "application/json")
+
+		resp, err := app.Test(req)
+
+		assert.NoError(t, err)
+		assert.Equal(t, fiber.StatusOK, resp.StatusCode)
+
+		var responseBody srvResp.LoginResponse
+		json.NewDecoder(resp.Body).Decode(&responseBody)
+		assert.Equal(t, "javi", responseBody.Username)
+		assert.Equal(t, "token", responseBody.Token)
+
+		mockUserService.AssertExpectations(t)
+	})
+	
+	t.Run("Credentials error", func(t *testing.T) {
+		mockUserService.ExpectedCalls = nil
+		mockUserService.On("Login", ctx, mock.Anything, mock.Anything).Return("", be.CredentialsError(span))
+
+		body, _ := json.Marshal(loginReq)
+		req := httptest.NewRequest(fiber.MethodPost, "/users/login", bytes.NewBuffer(body))
+		req.Header.Set("Content-Type", "application/json")
+
+		resp, err := app.Test(req)
+
+		assert.NoError(t, err)
+		assert.Equal(t, fiber.StatusUnauthorized, resp.StatusCode)
+
+		var responseBody response.ResponseError
+		json.NewDecoder(resp.Body).Decode(&responseBody)
+		assert.Equal(t, "FIBER-MICRO-003", responseBody.Get().Code)
+		assert.Equal(t, "Username or password incorrect!", responseBody.Get().Message)
+
+		mockUserService.AssertExpectations(t)
+	})
 }
 
 func TestCreate(t *testing.T) {

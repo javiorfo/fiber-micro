@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/javiorfo/fiber-micro/application/domain/model"
@@ -54,8 +55,7 @@ func (service *userService) Create(ctx context.Context, user *model.User, permNa
 	user.Password = hashedPassword
 	user.Salt = salt
 
-	log.Infof("%sHashed password created!", tracing.Log(span))
-	span.AddEvent("Hashed password created!")
+	log.Info(tracing.LogInfo(span, "Hashed password created!"))
 
 	err = service.userRepository.Create(ctx, user)
 	if err != nil {
@@ -101,7 +101,7 @@ func (service *userService) FindAll(ctx context.Context, filter pagination.Query
 	_, span := service.tracer.Start(ctx, tracing.Name())
 	defer span.End()
 
-	log.Infof("%sFilter %+v", tracing.Log(span), filter)
+	log.Info(tracing.LogInfo(span, fmt.Sprintf("Filter %+v", filter)))
 
 	return service.userRepository.FindAll(ctx, filter)
 }

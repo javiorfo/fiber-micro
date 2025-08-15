@@ -84,8 +84,15 @@ func (m *MockUserService) Create(ctx context.Context, user *model.User, permissi
 
 func (m *MockUserService) Login(ctx context.Context, username, password string) (string, backend.Error) {
 	args := m.Called(ctx, username, password)
-	if users, ok := args.Get(0).(string); ok {
-		return users, nil
+	var token string
+	if args.Get(0) != nil {
+		token = args.Get(0).(string)
 	}
-	return "", args.Get(0).(backend.Error)
+
+	var err backend.Error
+	if args.Get(1) != nil {
+		err = args.Get(1).(backend.Error)
+	}
+
+	return token, err
 }

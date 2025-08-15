@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"fmt"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/javiorfo/fiber-micro/adapter/database/entities"
@@ -72,7 +74,8 @@ func FindAllUsers(service port.UserService) fiber.Handler {
 				JSON(response.InternalServerError(span, response.Message(err.Error())))
 		}
 
-		return c.JSON(response.NewPaginationResponse(pagination.Paginator(*page, count), users))
+		return c.Status(fiber.StatusOK).
+			JSON(response.NewPaginationResponse(pagination.Paginator(*page, count), users))
 	}
 }
 
@@ -103,7 +106,7 @@ func CreateUser(service port.UserService) fiber.Handler {
 			return c.Status(fiber.StatusBadRequest).JSON(errResp)
 		}
 
-		log.Infof("%sReceived user: %+v", tracing.Log(span), userRequest)
+		log.Info(tracing.LogInfo(span, fmt.Sprintf("Received user: %+v", userRequest)))
 
 		user := userRequest.Into(security.GetTokenUsername(c))
 		if err := service.Create(ctx, &user, userRequest.Permission); err != nil {
@@ -139,7 +142,7 @@ func Login(service port.UserService) fiber.Handler {
 			return c.Status(fiber.StatusBadRequest).JSON(errResp)
 		}
 
-		log.Infof("%s Received credentials: %+v", tracing.Log(span), loginReq)
+		log.Infof(tracing.LogInfo(span, fmt.Sprintf("Received credentials: %+v", loginReq)))
 
 		token, err := service.Login(ctx, loginReq.Username, loginReq.Password)
 
@@ -147,6 +150,6 @@ func Login(service port.UserService) fiber.Handler {
 			return err.ToResponse(c)
 		}
 
-		return c.Status(fiber.StatusCreated).JSON(srvResponse.NewLoginResponse(loginReq.Username, token))
+		return c.Status(fiber.StatusOK).JSON(srvResponse.NewLoginResponse(loginReq.Username, token))
 	}
 }

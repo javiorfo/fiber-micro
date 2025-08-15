@@ -7,7 +7,7 @@ require (
 	github.com/gofiber/fiber/v2 v2.52.6
 	github.com/gofiber/swagger v1.1.1
 	github.com/google/uuid v1.6.0
-	github.com/javiorfo/go-microservice-lib v0.0.0-20250813164350-e08bf87b235b
+	github.com/javiorfo/go-microservice-lib v0.0.0-20250815031807-f8f9d33c6b86
 	github.com/javiorfo/nilo v1.0.1
 	github.com/javiorfo/steams v1.4.0
 	github.com/joho/godotenv v1.5.1

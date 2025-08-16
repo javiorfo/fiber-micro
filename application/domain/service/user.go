@@ -40,8 +40,8 @@ func (service *userService) Create(ctx context.Context, user *model.User, permNa
 		return backend.InternalError(span, err)
 	}
 
-	if permissionOpt.IsPresent() {
-		user.Permission = permissionOpt.Get()
+	if permissionOpt.IsSome() {
+		user.Permission = permissionOpt.Unwrap()
 	} else {
 		return errors.PermissionNotFound(span)
 	}
@@ -74,11 +74,11 @@ func (service *userService) Login(ctx context.Context, username string, password
 		return "", backend.InternalError(span, err)
 	}
 
-	if userOpt.IsEmpty() {
+	if userOpt.IsNone() {
 		return "", errors.UserNotFound(span)
 	}
 
-	user := userOpt.Get()
+	user := userOpt.Unwrap()
 
 	if user.VerifyPassword(password) {
 		roles := steams.OfSlice(user.Permission.Roles).MapToString(func(r model.Role) string {

@@ -18,10 +18,10 @@ func (m *MockPermissionRepository) Create(ctx context.Context, perm *model.Permi
 	return args.Error(0)
 }
 
-func (m *MockPermissionRepository) FindByName(ctx context.Context, name string) (nilo.Optional[model.Permission], error) {
+func (m *MockPermissionRepository) FindByName(ctx context.Context, name string) (nilo.Option[model.Permission], error) {
 	args := m.Called(ctx, name)
-	if perm, ok := args.Get(0).(nilo.Optional[model.Permission]); ok {
+	if perm, ok := args.Get(0).(nilo.Option[model.Permission]); ok {
 		return perm, args.Error(1)
 	}
-	return nilo.Empty[model.Permission](), args.Error(1)
+	return nilo.None[model.Permission](), args.Error(1)
 }

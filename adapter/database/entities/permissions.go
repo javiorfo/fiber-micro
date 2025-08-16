@@ -18,7 +18,7 @@ func (PermissionDB) TableName() string {
 func (permDB *PermissionDB) From(perm model.Permission) {
 	permDB.ID = perm.ID
 	permDB.Name = perm.Name
-	permDB.Roles = steams.Mapping(steams.OfSlice(perm.Roles), func(role model.Role) RoleDB {
+	permDB.Roles = steams.Mapper(steams.OfSlice(perm.Roles), func(role model.Role) RoleDB {
 		var roleDB RoleDB
 		roleDB.From(role)
 		return roleDB
@@ -29,7 +29,7 @@ func (permDB PermissionDB) Into() model.Permission {
 	return model.Permission{
 		ID:   permDB.ID,
 		Name: permDB.Name,
-		Roles: steams.Mapping(steams.OfSlice(permDB.Roles), func(roleDB RoleDB) model.Role {
+		Roles: steams.Mapper(steams.OfSlice(permDB.Roles), func(roleDB RoleDB) model.Role {
 			return roleDB.Into()
 		}).Collect(),
 	}

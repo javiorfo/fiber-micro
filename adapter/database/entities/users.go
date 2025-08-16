@@ -5,14 +5,16 @@ import (
 	"github.com/javiorfo/fiber-micro/application/domain/model"
 	"github.com/javiorfo/go-microservice-lib/auditory"
 	"github.com/javiorfo/go-microservice-lib/pagination"
+	"github.com/javiorfo/nilo"
 	"gorm.io/gorm"
 )
 
 type UserDB struct {
-	ID           uint         `gorm:"primaryKey;autoIncrement"`
-	Code         uuid.UUID    `gorm:"not null"`
-	Username     string       `gorm:"not null"`
-	Email        string       `gorm:"not null"`
+	ID           uint      `gorm:"primaryKey;autoIncrement"`
+	Code         uuid.UUID `gorm:"not null"`
+	Username     string    `gorm:"not null"`
+	Email        string    `gorm:"not null"`
+	Info         *string
 	PermissionID uint         `gorm:"not null"`
 	Permission   PermissionDB `gorm:"column:permission_id;not null"`
 	Password     string       `gorm:"not null"`
@@ -34,6 +36,7 @@ func (userDB *UserDB) From(user model.User) {
 	userDB.ID = user.ID
 	userDB.Username = user.Username
 	userDB.Email = user.Email
+	userDB.Info = user.Info.UnwrapUnchecked()
 	userDB.Status = user.Status
 	userDB.Password = user.Password
 	userDB.Salt = user.Salt
@@ -52,6 +55,7 @@ func (userDB UserDB) Into() model.User {
 		Code:           userDB.Code,
 		Username:       userDB.Username,
 		Email:          userDB.Email,
+		Info:           nilo.SomePtr(userDB.Info),
 		Status:         userDB.Status,
 		Password:       userDB.Password,
 		Salt:           userDB.Salt,

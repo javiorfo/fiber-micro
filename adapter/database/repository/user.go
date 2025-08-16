@@ -64,7 +64,7 @@ func (repository *userRepository) FindAll(ctx context.Context, queryFilter pagin
 		return nil, err
 	}
 
-	users := steams.Mapping(steams.OfSlice(usersDB), func(userDB entities.UserDB) model.User {
+	users := steams.Mapper(steams.OfSlice(usersDB), func(userDB entities.UserDB) model.User {
 		return userDB.Into()
 	}).Collect()
 
@@ -115,7 +115,7 @@ func (repository *userRepository) FindByCode(ctx context.Context, code uuid.UUID
 	return &user, nil
 }
 
-func (repository *userRepository) FindByUsername(ctx context.Context, username string) (nilo.Optional[model.User], error) {
+func (repository *userRepository) FindByUsername(ctx context.Context, username string) (nilo.Option[model.User], error) {
 	ctx, span := repository.tracer.Start(ctx, tracing.Name())
 	defer span.End()
 
@@ -125,14 +125,14 @@ func (repository *userRepository) FindByUsername(ctx context.Context, username s
 		Find(&userDB, "username = ?", username)
 
 	if err := result.Error; err != nil {
-		return nilo.Empty[model.User](), err
+		return nilo.None[model.User](), err
 	}
 
 	if result.RowsAffected == 0 {
-		return nilo.Empty[model.User](), nil
+		return nilo.None[model.User](), nil
 	}
 
 	user := userDB.Into()
 
-	return nilo.Of(user), nil
+	return nilo.Some(user), nil
 }

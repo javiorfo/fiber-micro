@@ -69,7 +69,7 @@ func TestLogin(t *testing.T) {
 
 		mockUserService.AssertExpectations(t)
 	})
-	
+
 	t.Run("Credentials error", func(t *testing.T) {
 		mockUserService.ExpectedCalls = nil
 		mockUserService.On("Login", ctx, mock.Anything, mock.Anything).Return("", be.CredentialsError(span))
@@ -121,6 +121,7 @@ func TestCreate(t *testing.T) {
 		var responseBody srvResp.CreateUserResponse
 		json.NewDecoder(resp.Body).Decode(&responseBody)
 		assert.Equal(t, "javi", responseBody.User.Username)
+		t.Logf("Response to creation: %+v", responseBody)
 
 		mockUserService.AssertExpectations(t)
 	})

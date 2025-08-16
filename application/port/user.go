@@ -12,7 +12,7 @@ import (
 
 type UserRepository interface {
 	FindByCode(ctx context.Context, code uuid.UUID) (*model.User, error)
-	FindByUsername(ctx context.Context, username string) (nilo.Optional[model.User], error)
+	FindByUsername(ctx context.Context, username string) (nilo.Option[model.User], error)
 	FindAll(ctx context.Context, queryFilter pagination.QueryFilter) ([]model.User, error)
 	Count(ctx context.Context, queryFilter pagination.QueryFilter) (int64, error)
 	Create(ctx context.Context, user *model.User) error

@@ -24,12 +24,12 @@ func (m *MockUserRepository) FindByCode(ctx context.Context, code uuid.UUID) (*m
 	return nil, args.Error(1)
 }
 
-func (m *MockUserRepository) FindByUsername(ctx context.Context, username string) (nilo.Optional[model.User], error) {
+func (m *MockUserRepository) FindByUsername(ctx context.Context, username string) (nilo.Option[model.User], error) {
 	args := m.Called(ctx, username)
-	if user, ok := args.Get(0).(nilo.Optional[model.User]); ok {
+	if user, ok := args.Get(0).(nilo.Option[model.User]); ok {
 		return user, args.Error(1)
 	}
-	return nilo.Empty[model.User](), args.Error(1)
+	return nilo.None[model.User](), args.Error(1)
 }
 
 func (m *MockUserRepository) FindAll(ctx context.Context, queryFilter pagination.QueryFilter) ([]model.User, error) {

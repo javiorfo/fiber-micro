@@ -239,6 +239,9 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
+                "info": {
+                    "$ref": "#/definitions/nilo.Option-string"
+                },
                 "permission": {
                     "$ref": "#/definitions/model.Permission"
                 },
@@ -263,6 +266,9 @@ const docTemplate = `{
                 "UserStatusBlocked"
             ]
         },
+        "nilo.Option-string": {
+            "type": "object"
+        },
         "request.CreateUserRequest": {
             "type": "object",
             "required": [
@@ -274,6 +280,9 @@ const docTemplate = `{
             ],
             "properties": {
                 "email": {
+                    "type": "string"
+                },
+                "info": {
                     "type": "string"
                 },
                 "password": {

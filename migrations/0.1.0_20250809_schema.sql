@@ -26,6 +26,7 @@ create table users (
     code uuid not null,
     username text not null,
     email text not null,
+    info text,
     password text not null,
     salt text not null,
     status text not null,

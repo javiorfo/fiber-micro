@@ -9,5 +9,5 @@ import (
 
 type PermissionRepository interface {
 	Create(ctx context.Context, user *model.Permission) error
-	FindByName(ctx context.Context, name string) (nilo.Optional[model.Permission], error)
+	FindByName(ctx context.Context, name string) (nilo.Option[model.Permission], error)
 }

@@ -40,7 +40,7 @@ func (repository *permissionRepository) Create(ctx context.Context, perm *model.
 	return nil
 }
 
-func (repository *permissionRepository) FindByName(ctx context.Context, name string) (nilo.Optional[model.Permission], error) {
+func (repository *permissionRepository) FindByName(ctx context.Context, name string) (nilo.Option[model.Permission], error) {
 	ctx, span := repository.tracer.Start(ctx, tracing.Name())
 	defer span.End()
 
@@ -48,14 +48,14 @@ func (repository *permissionRepository) FindByName(ctx context.Context, name str
 	result := repository.WithContext(ctx).Find(&permDB, "name = ?", name)
 
 	if err := result.Error; err != nil {
-		return nilo.Empty[model.Permission](), err
+		return nilo.None[model.Permission](), err
 	}
 
 	if result.RowsAffected == 0 {
-		return nilo.Empty[model.Permission](), nil
+		return nilo.None[model.Permission](), nil
 	}
 
 	permission := permDB.Into()
 
-	return nilo.Of(permission), nil
+	return nilo.Some(permission), nil
 }

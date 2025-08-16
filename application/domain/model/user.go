@@ -6,21 +6,23 @@ import (
 	"github.com/google/uuid"
 	"github.com/javiorfo/go-microservice-lib/security"
 	"github.com/javiorfo/go-microservice-lib/validation"
+	"github.com/javiorfo/nilo"
 )
 
 type User struct {
-	ID             uint       `json:"-"`
-	Code           uuid.UUID  `json:"code"`
-	Username       string     `json:"username"`
-	Email          string     `json:"email"`
-	Permission     Permission `json:"permission"`
-	Status         UserStatus `json:"status"`
-	Password       string     `json:"-"`
-	Salt           string     `json:"-"`
-	CreatedBy      string     `json:"-"`
-	LastModifiedBy *string    `json:"-"`
-	CreateDate     time.Time  `json:"-"`
-	LastModified   *time.Time `json:"-"`
+	ID             uint                `json:"-"`
+	Code           uuid.UUID           `json:"code"`
+	Username       string              `json:"username"`
+	Email          string              `json:"email"`
+	Info           nilo.Option[string] `json:"info"`
+	Permission     Permission          `json:"permission"`
+	Status         UserStatus          `json:"status"`
+	Password       string              `json:"-"`
+	Salt           string              `json:"-"`
+	CreatedBy      string              `json:"-"`
+	LastModifiedBy *string             `json:"-"`
+	CreateDate     time.Time           `json:"-"`
+	LastModified   *time.Time          `json:"-"`
 }
 
 func NewUser(username string, email string, permission Permission, password string, createdBy string) User {

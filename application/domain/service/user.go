@@ -40,9 +40,7 @@ func (service *userService) Create(ctx context.Context, user *model.User, permNa
 		return backend.InternalError(span, err)
 	}
 
-	if permissionOpt.IsSome() {
-		user.Permission = permissionOpt.Unwrap()
-	} else {
+	if permissionOpt.IsNone() {
 		return errors.PermissionNotFound(span)
 	}
 
@@ -51,8 +49,8 @@ func (service *userService) Create(ctx context.Context, user *model.User, permNa
 		return backend.InternalError(span, err)
 	}
 
-	hashedPassword := security.Hash(user.Password, salt)
-	user.Password = hashedPassword
+	user.Permission = permissionOpt.Unwrap()
+	user.Password = security.Hash(user.Password, salt)
 	user.Salt = salt
 
 	log.Info(tracing.LogInfo(span, "Hashed password created!"))

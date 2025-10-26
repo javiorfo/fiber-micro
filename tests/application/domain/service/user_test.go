@@ -6,13 +6,12 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/javiorfo/fiber-micro/adapter/database/entities"
 	"github.com/javiorfo/fiber-micro/application/domain/model"
 	"github.com/javiorfo/fiber-micro/application/domain/service"
 	"github.com/javiorfo/fiber-micro/tests/mocks"
-	"github.com/javiorfo/go-microservice-lib/pagination"
 	"github.com/javiorfo/go-microservice-lib/response"
 	"github.com/javiorfo/go-microservice-lib/security"
+	"github.com/javiorfo/gormen/pagination"
 	"github.com/javiorfo/nilo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -100,16 +99,16 @@ func TestUserLogin(t *testing.T) {
 }
 
 func TestUserFindAll(t *testing.T) {
-	queryFilter := entities.NewUserFilter(pagination.DefaultPage(), "Javi", "", "")
-	expected := []model.User{
+	pageRequest := pagination.DefaultPageRequest()
+	expected := &pagination.Page[model.User]{Elements: []model.User{
 		{ID: 1},
 		{ID: 2},
-	}
+	}, Total: 2}
 
 	ctx := context.Background()
-	userRepo.On("FindAll", ctx, queryFilter).Return(expected, nil)
+	userRepo.On("FindAll", ctx, pageRequest).Return(expected, nil)
 
-	result, err := userService.FindAll(ctx, queryFilter)
+	result, err := userService.FindAll(ctx, pageRequest)
 
 	assert.NoError(t, err)
 	assert.Equal(t, expected, result)

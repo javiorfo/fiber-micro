@@ -10,11 +10,12 @@ import (
 	srvResponse "github.com/javiorfo/fiber-micro/adapter/http/response"
 	"github.com/javiorfo/fiber-micro/application/domain/model"
 	"github.com/javiorfo/fiber-micro/application/port"
-	"github.com/javiorfo/go-microservice-lib/pagination"
 	"github.com/javiorfo/go-microservice-lib/response"
 	"github.com/javiorfo/go-microservice-lib/security"
 	"github.com/javiorfo/go-microservice-lib/tracing"
 	"github.com/javiorfo/go-microservice-lib/validation"
+	"github.com/javiorfo/gormen/pagination"
+	"github.com/javiorfo/gormen/pagination/sort"
 	"go.opentelemetry.io/otel"
 )
 
@@ -41,11 +42,22 @@ func FindAllUsers(service port.UserService) fiber.Handler {
 		ctx, span := tracer.Start(c.UserContext(), c.Path())
 		defer span.End()
 
-		page, err := pagination.NewPage(
-			c.Query("page", "1"),
-			c.Query("size", "10"),
-			c.Query("sortBy", "id"),
-			c.Query("sortOrder", "asc"),
+		pn := c.Query("page", "1")
+		ps := c.Query("size", "10")
+		pageRequest, err := pagination.PageRequestFrom(
+			pn,
+			ps,
+			pagination.WithSortOrder(
+				c.Query("sortBy", "id"),
+				sort.DirectionFromString(c.Query("sortOrder", "asc")),
+			),
+			pagination.WithFilter(
+				entities.NewUserFilter(
+					c.Get("username"),
+					c.Get("permissions.name"),
+					c.Get("createDate"),
+				),
+			),
 		)
 
 		if err != nil {
@@ -56,26 +68,14 @@ func FindAllUsers(service port.UserService) fiber.Handler {
 				}))
 		}
 
-		filter := entities.NewUserFilter(*page,
-			c.Get("username"),
-			c.Get("permissions.name"),
-			c.Get("createDate"),
-		)
-
-		users, err := service.FindAll(ctx, filter)
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).
-				JSON(response.InternalServerError(span, response.Message(err.Error())))
-		}
-
-		count, err := service.Count(ctx, filter)
+		page, err := service.FindAll(ctx, pageRequest)
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).
 				JSON(response.InternalServerError(span, response.Message(err.Error())))
 		}
 
 		return c.Status(fiber.StatusOK).
-			JSON(response.NewPaginationResponse(pagination.Paginator(*page, count), users))
+			JSON(response.NewPaginationResponse(pn, ps, page.Total, page.Elements))
 	}
 }
 

@@ -5,7 +5,10 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/signal"
 	"strings"
+	"syscall"
+	"time"
 
 	"github.com/gofiber/swagger"
 
@@ -63,7 +66,10 @@ func main() {
 	_ = traceProvider.Tracer(appName)
 
 	// Fiber
-	app := fiber.New(fiber.Config{DisableStartupMessage: true})
+	app := fiber.New(fiber.Config{
+		DisableStartupMessage: true,
+		IdleTimeout:           15 * time.Second,
+	})
 
 	app.Use(cors.New())
 	app.Use(recover.New())
@@ -110,5 +116,18 @@ func main() {
 	log.Infof("Context path: %s", appContextPath)
 	log.Infof("Starting %s on port %s...", appName, appPort)
 	log.Info("Server Up!")
-	log.Fatal(app.Listen(appPort))
+
+	go func() {
+		log.Panic(app.Listen(appPort))
+	}()
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+
+	_ = <-c
+	log.Info("Gracefully shutting down...")
+	_ = app.Shutdown()
+	db, _ := database.DBinstance.DB()
+	db.Close()
+	log.Info("Done!")
 }

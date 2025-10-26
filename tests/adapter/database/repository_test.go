@@ -6,7 +6,7 @@ import (
 
 	"github.com/javiorfo/fiber-micro/adapter/database/entities"
 	"github.com/javiorfo/fiber-micro/application/domain/model"
-	"github.com/javiorfo/go-microservice-lib/pagination"
+	"github.com/javiorfo/gormen/pagination"
 )
 
 func TestDatabase(t *testing.T) {
@@ -64,43 +64,32 @@ func TestDatabase(t *testing.T) {
 	}
 
 	// Find all
-	filter := entities.NewUserFilter(pagination.DefaultPage(), "Javi", "PERM", "")
-	users, err := userRepo.FindAll(ctx, filter)
+	pageRequest, err := pagination.PageRequestFrom(1, 10, pagination.WithFilter(entities.NewUserFilter("Javi", "PERM", "")))
+	page, err := userRepo.FindAll(ctx, pageRequest)
 	if err != nil {
 		t.Fatalf("Failed to execute findAll: %v", err)
 	}
 
-	if len(users) == 0 {
+	if len(page.Elements) == 0 {
 		t.Error("Expected '1', got '0'")
 	}
 
-	count, err := userRepo.Count(ctx, filter)
-	if err != nil {
-		t.Fatalf("Failed to execute count: %v", err)
-	}
-
-	if count == 0 {
+	if page.Total == 0 {
 		t.Error("Expected '1', got '0'")
 	}
 
 	// Diff filter and page against count
-	page, _ := pagination.NewPage("1", "1", "id", "asc")
-	filter = entities.NewUserFilter(*page, "", "", "")
-	users, err = userRepo.FindAll(ctx, filter)
+	pageRequest, err = pagination.PageRequestFrom(1, 1, pagination.WithFilter(entities.NewUserFilter("", "", "")))
+	page, err = userRepo.FindAll(ctx, pageRequest)
 	if err != nil {
 		t.Fatalf("Failed to execute findAll: %v", err)
 	}
 
-	if len(users) != 1 {
-		t.Errorf("Expected '1', got %d", len(users))
+	if len(page.Elements) != 1 {
+		t.Errorf("Expected '1', got %d", len(page.Elements))
 	}
 
-	count, err = userRepo.Count(ctx, filter)
-	if err != nil {
-		t.Fatalf("Failed to execute count: %v", err)
-	}
-
-	if count != 3 {
-		t.Errorf("Expected '3', got %d", count)
+	if page.Total != 3 {
+		t.Errorf("Expected '3', got %d", page.Total)
 	}
 }

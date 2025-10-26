@@ -10,16 +10,16 @@ import (
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/javiorfo/fiber-micro/adapter/database/entities"
 	"github.com/javiorfo/fiber-micro/adapter/http/request"
 	srvResp "github.com/javiorfo/fiber-micro/adapter/http/response"
 	"github.com/javiorfo/fiber-micro/adapter/http/routes"
 	"github.com/javiorfo/fiber-micro/application/domain/model"
 	be "github.com/javiorfo/fiber-micro/application/domain/service/errors"
 	"github.com/javiorfo/fiber-micro/tests/mocks"
-	"github.com/javiorfo/go-microservice-lib/pagination"
 	"github.com/javiorfo/go-microservice-lib/response"
 	"github.com/javiorfo/go-microservice-lib/response/backend"
+	"github.com/javiorfo/gormen/pagination"
+	"github.com/javiorfo/gormen/pagination/sort"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"go.opentelemetry.io/otel"
@@ -158,10 +158,9 @@ func TestHandlerFindAll(t *testing.T) {
 	defer span.End()
 
 	t.Run("Successful", func(t *testing.T) {
-		page := pagination.Page{Page: 1, Size: 10, SortBy: "username", SortOrder: "asc"}
-		userFilter := entities.NewUserFilter(page, "", "", "")
-		mockUserService.On("FindAll", ctx, userFilter).Return([]model.User{{ID: 1, Username: "javi"}}, nil)
-		mockUserService.On("Count", ctx, userFilter).Return(int64(1), nil)
+		pageRequest, err := pagination.PageRequestFrom(1, 10, pagination.WithSortOrder("username", sort.Ascending))
+
+		mockUserService.On("FindAll", ctx, pageRequest).Return([]model.User{{ID: 1, Username: "javi"}}, nil)
 
 		req := httptest.NewRequest("GET", "/users?page=1&size=10&sortBy=username&sortOrder=asc", nil)
 		resp, err := app.Test(req)

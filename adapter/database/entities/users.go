@@ -4,7 +4,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/javiorfo/fiber-micro/application/domain/model"
 	"github.com/javiorfo/go-microservice-lib/auditory"
-	"github.com/javiorfo/go-microservice-lib/pagination"
 	"github.com/javiorfo/nilo"
 	"gorm.io/gorm"
 )
@@ -69,24 +68,14 @@ func (userDB UserDB) Into() model.User {
 
 type userFilter struct {
 	Username       string `filter:"users.username = ?"`
-	PermissionName string `filter:"permissions.name = ?"`
-	CreateDate     string `filter:"create_date > ?;type:time.Time"`
-	pagination.Page
+	PermissionName string `filter:"permissions.name = ?;join:inner join permissions on users.permission_id = permissions.id"`
+	CreateDate     string `filter:"create_date > ?"`
 }
 
-func (uf userFilter) PaginateAndFilter(db *gorm.DB) (*gorm.DB, error) {
-	return pagination.PaginateAndFilter(db, uf.Page, uf)
-}
-
-func (uf userFilter) FilterOnly(db *gorm.DB) (*gorm.DB, error) {
-	return pagination.FilterOnly(db, uf)
-}
-
-func NewUserFilter(page pagination.Page, username, permissionName, createDate string) *userFilter {
-	return &userFilter{
+func NewUserFilter(username, permissionName, createDate string) userFilter {
+	return userFilter{
 		Username:       username,
 		PermissionName: permissionName,
 		CreateDate:     createDate,
-		Page:           page,
 	}
 }

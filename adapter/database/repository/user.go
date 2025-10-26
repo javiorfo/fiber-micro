@@ -9,10 +9,11 @@ import (
 	"github.com/javiorfo/fiber-micro/adapter/database/entities"
 	"github.com/javiorfo/fiber-micro/application/domain/model"
 	"github.com/javiorfo/fiber-micro/application/port"
-	"github.com/javiorfo/go-microservice-lib/pagination"
 	"github.com/javiorfo/go-microservice-lib/tracing"
+	"github.com/javiorfo/gormen"
+	"github.com/javiorfo/gormen/converter"
+	"github.com/javiorfo/gormen/pagination"
 	"github.com/javiorfo/nilo"
-	"github.com/javiorfo/steams"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
 	"gorm.io/gorm"
@@ -21,10 +22,15 @@ import (
 type userRepository struct {
 	*gorm.DB
 	tracer trace.Tracer
+	gr     gormen.ReadRepository[model.User]
 }
 
 func NewUserRepository(db *gorm.DB) port.UserRepository {
-	return &userRepository{DB: db, tracer: otel.Tracer(tracing.Name())}
+	return &userRepository{
+		DB:     db,
+		tracer: otel.Tracer(tracing.Name()),
+		gr:     converter.NewRepository[entities.UserDB, *entities.UserDB](db),
+	}
 }
 
 func (repository *userRepository) Create(ctx context.Context, user *model.User) error {
@@ -44,55 +50,11 @@ func (repository *userRepository) Create(ctx context.Context, user *model.User) 
 	return nil
 }
 
-func (repository *userRepository) FindAll(ctx context.Context, queryFilter pagination.QueryFilter) ([]model.User, error) {
+func (repository *userRepository) FindAll(ctx context.Context, pageable pagination.Pageable) (*pagination.Page[model.User], error) {
 	ctx, span := repository.tracer.Start(ctx, tracing.Name())
 	defer span.End()
 
-	var usersDB []entities.UserDB
-	filter := repository.WithContext(ctx).
-		Preload("Permission.Roles").
-		Joins("INNER JOIN permissions ON users.permission_id = permissions.id")
-
-	filter, err := queryFilter.PaginateAndFilter(filter)
-	if err != nil {
-		return nil, err
-	}
-
-	results := filter.Find(&usersDB)
-
-	if err := results.Error; err != nil {
-		return nil, err
-	}
-
-	users := steams.Mapper(steams.OfSlice(usersDB), func(userDB entities.UserDB) model.User {
-		return userDB.Into()
-	}).Collect()
-
-	return users, nil
-}
-
-func (repository *userRepository) Count(ctx context.Context, queryFilter pagination.QueryFilter) (int64, error) {
-	ctx, span := repository.tracer.Start(ctx, tracing.Name())
-	defer span.End()
-
-	filter := repository.WithContext(ctx).
-		Model(entities.UserDB{}).
-		Preload("Permission.Roles").
-		Joins("INNER JOIN permissions ON users.permission_id = permissions.id")
-
-	filter, err := queryFilter.FilterOnly(filter)
-	if err != nil {
-		return 0, err
-	}
-
-	var count int64
-	results := filter.Count(&count)
-
-	if err := results.Error; err != nil {
-		return 0, err
-	}
-
-	return count, nil
+	return repository.gr.FindAllPaginated(ctx, pageable, "Permission.Roles")
 }
 
 func (repository *userRepository) FindByCode(ctx context.Context, code uuid.UUID) (*model.User, error) {

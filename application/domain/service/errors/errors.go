@@ -4,11 +4,10 @@ import (
 	"net/http"
 
 	"github.com/javiorfo/go-microservice-lib/response"
-	"github.com/javiorfo/go-microservice-lib/response/backend"
 	"go.opentelemetry.io/otel/trace"
 )
 
-func PermissionNotFound(span trace.Span) backend.Error {
+func PermissionNotFound(span trace.Span) error {
 	return response.NewResponseError(span,
 		response.Error{
 			HttpStatus: http.StatusBadRequest,
@@ -18,7 +17,7 @@ func PermissionNotFound(span trace.Span) backend.Error {
 	)
 }
 
-func UserNotFound(span trace.Span) backend.Error {
+func UserNotFound(span trace.Span) error {
 	return response.NewResponseError(span,
 		response.Error{
 			HttpStatus: http.StatusBadRequest,
@@ -28,7 +27,7 @@ func UserNotFound(span trace.Span) backend.Error {
 	)
 }
 
-func CredentialsError(span trace.Span) backend.Error {
+func CredentialsError(span trace.Span) error {
 	return response.NewResponseError(span,
 		response.Error{
 			HttpStatus: http.StatusUnauthorized,

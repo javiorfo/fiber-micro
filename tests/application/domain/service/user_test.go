@@ -60,7 +60,7 @@ func TestUserCreate(t *testing.T) {
 
 	backErr := userService.Create(ctx, &user, perm.Name)
 
-	assert.Nil(t, backErr)
+	assert.NoError(t, backErr)
 	userRepo.AssertExpectations(t)
 	permRepo.AssertExpectations(t)
 }

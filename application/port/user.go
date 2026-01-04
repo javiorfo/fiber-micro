@@ -5,7 +5,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/javiorfo/fiber-micro/application/domain/model"
-	"github.com/javiorfo/go-microservice-lib/response/backend"
 	"github.com/javiorfo/gormen/pagination"
 	"github.com/javiorfo/nilo"
 )
@@ -19,6 +18,6 @@ type UserRepository interface {
 
 type UserService interface {
 	FindAll(ctx context.Context, pageable pagination.Pageable) (*pagination.Page[model.User], error)
-	Create(ctx context.Context, user *model.User, permission string) backend.Error
-	Login(ctx context.Context, username, password string) (string, backend.Error)
+	Create(ctx context.Context, user *model.User, permission string) error
+	Login(ctx context.Context, username, password string) (string, error)
 }

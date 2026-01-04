@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/javiorfo/fiber-micro/adapter/database/entities"
 	"github.com/javiorfo/fiber-micro/adapter/http/request"
 	srvResp "github.com/javiorfo/fiber-micro/adapter/http/response"
 	"github.com/javiorfo/fiber-micro/adapter/http/routes"
@@ -158,9 +159,12 @@ func TestHandlerFindAll(t *testing.T) {
 	defer span.End()
 
 	t.Run("Successful", func(t *testing.T) {
-		pageRequest, err := pagination.PageRequestFrom(1, 10, pagination.WithSortOrder("username", sort.Ascending))
+		pageRequest, err := pagination.PageRequestFrom(1, 10, pagination.WithSortOrder("username", sort.Ascending),
+			pagination.WithFilter(entities.NewUserFilter("", "", "")))
 
-		mockUserService.On("FindAll", ctx, pageRequest).Return([]model.User{{ID: 1, Username: "javi"}}, nil)
+		page := &pagination.Page[model.User]{Total: 1, Elements: []model.User{{ID: 1, Username: "javi"}}}
+
+		mockUserService.On("FindAll", ctx, pageRequest).Return(page, nil)
 
 		req := httptest.NewRequest("GET", "/users?page=1&size=10&sortBy=username&sortOrder=asc", nil)
 		resp, err := app.Test(req)

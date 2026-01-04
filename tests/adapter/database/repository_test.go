@@ -22,7 +22,7 @@ func TestDatabase(t *testing.T) {
 		t.Fatalf("Failed to insert role2: %v", err)
 	}
 
-	permission := model.NewPermission("PERM", []model.Role{*role1, *role2})
+	permission := model.NewPermission("PERM2", []model.Role{*role1, *role2})
 	if err := permRepo.Create(ctx, permission); err != nil {
 		t.Fatalf("Failed to insert permission: %v", err)
 	}
@@ -44,12 +44,12 @@ func TestDatabase(t *testing.T) {
 		t.Errorf("Expected name to be 'auditor', got '%s'", userResult.Unwrap().CreatedBy)
 	}
 
-	if userResult.Unwrap().ID != 1 {
-		t.Errorf("Expected name to be '1', got '%d'", userResult.Unwrap().ID)
+	if userResult.Unwrap().ID != 3 {
+		t.Errorf("Expected name to be '3', got '%d'", userResult.Unwrap().ID)
 	}
 
-	if userResult.Unwrap().Permission.Name != "PERM" {
-		t.Errorf("Expected Permission Name to be 'PERM', got '%v'", userResult.Unwrap().Permission)
+	if userResult.Unwrap().Permission.Name != "PERM2" {
+		t.Errorf("Expected Permission Name to be 'PERM2', got '%v'", userResult.Unwrap().Permission)
 	}
 
 	// User inserts to test pagination
@@ -64,7 +64,7 @@ func TestDatabase(t *testing.T) {
 	}
 
 	// Find all
-	pageRequest, err := pagination.PageRequestFrom(1, 10, pagination.WithFilter(entities.NewUserFilter("Javi", "PERM", "")))
+	pageRequest, err := pagination.PageRequestFrom(1, 10, pagination.WithFilter(entities.NewUserFilter("Javi", "PERM2", "")))
 	page, err := userRepo.FindAll(ctx, pageRequest)
 	if err != nil {
 		t.Fatalf("Failed to execute findAll: %v", err)
@@ -89,7 +89,7 @@ func TestDatabase(t *testing.T) {
 		t.Errorf("Expected '1', got %d", len(page.Elements))
 	}
 
-	if page.Total != 3 {
-		t.Errorf("Expected '3', got %d", page.Total)
+	if page.Total != 5 {
+		t.Errorf("Expected '5', got %d", page.Total)
 	}
 }

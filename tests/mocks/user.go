@@ -5,7 +5,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/javiorfo/fiber-micro/application/domain/model"
-	"github.com/javiorfo/go-microservice-lib/response/backend"
 	"github.com/javiorfo/gormen/pagination"
 	"github.com/javiorfo/nilo"
 	"github.com/stretchr/testify/mock"
@@ -58,25 +57,35 @@ func (m *MockUserService) FindAll(ctx context.Context, pageable pagination.Pagea
 	return nil, args.Error(1)
 }
 
-func (m *MockUserService) Create(ctx context.Context, user *model.User, permission string) backend.Error {
+func (m *MockUserService) Create(ctx context.Context, user *model.User, permission string) error {
 	args := m.Called(ctx, user, permission)
-	if be, ok := args.Get(0).(backend.Error); ok {
-		return be
-	}
-	return nil
+	return args.Error(0)
+	/*
+		 	if be, ok := args.Get(0).(backend.Error); ok {
+				return be
+			}
+			return nil
+	*/
 }
 
-func (m *MockUserService) Login(ctx context.Context, username, password string) (string, backend.Error) {
+func (m *MockUserService) Login(ctx context.Context, username, password string) (string, error) {
 	args := m.Called(ctx, username, password)
-	var token string
-	if args.Get(0) != nil {
-		token = args.Get(0).(string)
+	if str, ok := args.Get(0).(string); ok {
+		return str, args.Error(1)
 	}
+	return "", args.Error(1)
 
-	var err backend.Error
-	if args.Get(1) != nil {
-		err = args.Get(1).(backend.Error)
-	}
+	/*
+		 	var token string
+			if args.Get(0) != nil {
+				token = args.Get(0).(string)
+			}
 
-	return token, err
+			var err backend.Error
+			if args.Get(1) != nil {
+				err = args.Get(1).(backend.Error)
+			}
+
+			return token, err
+	*/
 }

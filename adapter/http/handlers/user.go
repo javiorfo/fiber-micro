@@ -11,6 +11,7 @@ import (
 	"github.com/javiorfo/fiber-micro/application/domain/model"
 	"github.com/javiorfo/fiber-micro/application/port"
 	"github.com/javiorfo/go-microservice-lib/response"
+	"github.com/javiorfo/go-microservice-lib/response/backend"
 	"github.com/javiorfo/go-microservice-lib/security"
 	"github.com/javiorfo/go-microservice-lib/tracing"
 	"github.com/javiorfo/go-microservice-lib/validation"
@@ -110,7 +111,7 @@ func CreateUser(service port.UserService) fiber.Handler {
 
 		user := userRequest.Into(security.GetTokenUsername(c))
 		if err := service.Create(ctx, &user, userRequest.Permission); err != nil {
-			return err.ToResponse(c)
+			return backend.ParseError(c, err)
 		}
 
 		return c.Status(fiber.StatusCreated).JSON(srvResponse.CreateUserResponse{User: user})
@@ -147,7 +148,7 @@ func Login(service port.UserService) fiber.Handler {
 		token, err := service.Login(ctx, loginReq.Username, loginReq.Password)
 
 		if err != nil {
-			return err.ToResponse(c)
+			return backend.ParseError(c, err)
 		}
 
 		return c.Status(fiber.StatusOK).JSON(srvResponse.NewLoginResponse(loginReq.Username, token))

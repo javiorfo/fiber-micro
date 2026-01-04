@@ -31,7 +31,7 @@ func NewUserService(ur port.UserRepository, pr port.PermissionRepository) port.U
 	}
 }
 
-func (service *userService) Create(ctx context.Context, user *model.User, permName string) backend.Error {
+func (service *userService) Create(ctx context.Context, user *model.User, permName string) error {
 	_, span := service.tracer.Start(ctx, tracing.Name())
 	defer span.End()
 
@@ -63,7 +63,7 @@ func (service *userService) Create(ctx context.Context, user *model.User, permNa
 	return nil
 }
 
-func (service *userService) Login(ctx context.Context, username string, password string) (string, backend.Error) {
+func (service *userService) Login(ctx context.Context, username string, password string) (string, error) {
 	_, span := service.tracer.Start(ctx, tracing.Name())
 	defer span.End()
 

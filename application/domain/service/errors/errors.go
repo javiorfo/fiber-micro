@@ -7,24 +7,28 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-func PermissionNotFound(span trace.Span) error {
-	return response.NewResponseError(span,
-		response.Error{
-			HttpStatus: http.StatusBadRequest,
-			Code:       response.ErrorCode("FIBER-MICRO-001"),
-			Message:    response.Message("Permission not found!"),
-		},
-	)
+func PermissionNotFound(span trace.Span) func() error {
+	return func() error {
+		return response.NewResponseError(span,
+			response.Error{
+				HttpStatus: http.StatusBadRequest,
+				Code:       response.ErrorCode("FIBER-MICRO-001"),
+				Message:    response.Message("Permission not found!"),
+			},
+		)
+	}
 }
 
-func UserNotFound(span trace.Span) error {
-	return response.NewResponseError(span,
-		response.Error{
-			HttpStatus: http.StatusBadRequest,
-			Code:       response.ErrorCode("FIBER-MICRO-002"),
-			Message:    response.Message("User not found!"),
-		},
-	)
+func UserNotFound(span trace.Span) func() error {
+	return func() error {
+		return response.NewResponseError(span,
+			response.Error{
+				HttpStatus: http.StatusBadRequest,
+				Code:       response.ErrorCode("FIBER-MICRO-002"),
+				Message:    response.Message("User not found!"),
+			},
+		)
+	}
 }
 
 func CredentialsError(span trace.Span) error {

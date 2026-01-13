@@ -104,8 +104,8 @@ github.com/jackc/puddle/v2 v2.2.2 h1:PR8nw+E/1w0GLuRFSmiioY6UooMp6KJv0/61nB7icHo
 github.com/jackc/puddle/v2 v2.2.2/go.mod h1:vriiEXHvEE654aYKXXjOvZM39qJ0q+azkZFrfEOc3H4=
 github.com/javiorfo/go-microservice-lib v0.0.0-20260104190516-b5223c5c2965 h1:O09ajV1Hk7YDOMV+u3biHHP6zB4geip5mO+tZzP5Phw=
 github.com/javiorfo/go-microservice-lib v0.0.0-20260104190516-b5223c5c2965/go.mod h1:yS6Aj8vVLs7EDiPVGw2cwswm5lRs2Vs1vE5Dq0y9d9Q=
-github.com/javiorfo/gormen v0.2.0 h1:f4hkgTzer76q6TVb/ehHiaO9ABuxxU4xook5RVbsIpc=
-github.com/javiorfo/gormen v0.2.0/go.mod h1:WH+tboYC6gNqJ9K3TTiXnPCjl6JGm0BVZh7782BAkw8=
+github.com/javiorfo/gormen v0.3.0 h1:4zVRukUPv0sDnWCh/q9wY3Dlow6zzf0H/ZuZyzHBt48=
+github.com/javiorfo/gormen v0.3.0/go.mod h1:VXjKViaf8NhD8yjraUBIBelAf6LxxW9voSlsCkb4luU=
 github.com/javiorfo/nilo v1.2.0 h1:LZCZyeiUomrD01ECPd+PsOp9WF8gLLRpX/pPn1txF9I=
 github.com/javiorfo/nilo v1.2.0/go.mod h1:cJBBOCqyc+87XmxDyJrenoIfhUkjsb07RRyNZOMJe90=
 github.com/javiorfo/steams v1.5.0 h1:TfWx0yMqr8oPQxIyqEym1Qu8+6pXyo5Z4pSg+1cdP7I=

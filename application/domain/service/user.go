@@ -40,8 +40,9 @@ func (service *userService) Create(ctx context.Context, user *model.User, permNa
 		return backend.InternalError(span, err)
 	}
 
-	if permissionOpt.IsNone() {
-		return errors.PermissionNotFound(span)
+	perm, err := permissionOpt.OkOrElse(errors.PermissionNotFound(span))
+	if err != nil {
+		return err
 	}
 
 	salt, err := security.GenerateSalt()
@@ -49,7 +50,7 @@ func (service *userService) Create(ctx context.Context, user *model.User, permNa
 		return backend.InternalError(span, err)
 	}
 
-	user.Permission = permissionOpt.Unwrap()
+	user.Permission = *perm
 	user.Password = security.Hash(user.Password, salt)
 	user.Salt = salt
 
@@ -72,11 +73,10 @@ func (service *userService) Login(ctx context.Context, username string, password
 		return "", backend.InternalError(span, err)
 	}
 
-	if userOpt.IsNone() {
-		return "", errors.UserNotFound(span)
+	user, err := userOpt.OkOrElse(errors.UserNotFound(span))
+	if err != nil {
+		return "", err
 	}
-
-	user := userOpt.Unwrap()
 
 	if user.VerifyPassword(password) {
 		roles := steams.OfSlice(user.Permission.Roles).MapToString(func(r model.Role) string {

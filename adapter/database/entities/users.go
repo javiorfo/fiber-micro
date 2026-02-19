@@ -35,7 +35,7 @@ func (userDB *UserDB) From(user model.User) {
 	userDB.ID = user.ID
 	userDB.Username = user.Username
 	userDB.Email = user.Email
-	userDB.Info = user.Info.UnwrapUnchecked()
+	userDB.Info = user.Info.AsPtr()
 	userDB.Status = user.Status
 	userDB.Password = user.Password
 	userDB.Salt = user.Salt
@@ -54,7 +54,7 @@ func (userDB UserDB) Into() model.User {
 		Code:           userDB.Code,
 		Username:       userDB.Username,
 		Email:          userDB.Email,
-		Info:           nilo.SomePtr(userDB.Info),
+		Info:           nilo.Ptr(userDB.Info),
 		Status:         userDB.Status,
 		Password:       userDB.Password,
 		Salt:           userDB.Salt,

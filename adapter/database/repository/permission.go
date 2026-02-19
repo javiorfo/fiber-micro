@@ -48,14 +48,14 @@ func (repository *permissionRepository) FindByName(ctx context.Context, name str
 	result := repository.WithContext(ctx).Find(&permDB, "name = ?", name)
 
 	if err := result.Error; err != nil {
-		return nilo.None[model.Permission](), err
+		return nilo.Nil[model.Permission](), err
 	}
 
 	if result.RowsAffected == 0 {
-		return nilo.None[model.Permission](), nil
+		return nilo.Nil[model.Permission](), nil
 	}
 
 	permission := permDB.Into()
 
-	return nilo.Some(permission), nil
+	return nilo.Value(permission), nil
 }

@@ -40,16 +40,16 @@ func TestDatabase(t *testing.T) {
 		t.Fatalf("Failed to query record: %v", err)
 	}
 
-	if userResult.Unwrap().CreatedBy != "auditor" {
-		t.Errorf("Expected name to be 'auditor', got '%s'", userResult.Unwrap().CreatedBy)
+	if userResult.AsValue().CreatedBy != "auditor" {
+		t.Errorf("Expected name to be 'auditor', got '%s'", userResult.AsValue().CreatedBy)
 	}
 
-	if userResult.Unwrap().ID != 3 {
-		t.Errorf("Expected name to be '3', got '%d'", userResult.Unwrap().ID)
+	if userResult.AsValue().ID != 3 {
+		t.Errorf("Expected name to be '3', got '%d'", userResult.AsValue().ID)
 	}
 
-	if userResult.Unwrap().Permission.Name != "PERM2" {
-		t.Errorf("Expected Permission Name to be 'PERM2', got '%v'", userResult.Unwrap().Permission)
+	if userResult.AsValue().Permission.Name != "PERM2" {
+		t.Errorf("Expected Permission Name to be 'PERM2', got '%v'", userResult.AsValue().Permission)
 	}
 
 	// User inserts to test pagination

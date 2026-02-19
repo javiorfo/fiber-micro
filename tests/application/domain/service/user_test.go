@@ -44,7 +44,7 @@ func TestUserCreate(t *testing.T) {
 		Name:  "PERM",
 		Roles: []model.Role{{ID: 1, Name: "ROLE_1"}},
 	}
-	permRepo.On("FindByName", ctx, mock.Anything).Return(nilo.Some(perm), nil)
+	permRepo.On("FindByName", ctx, mock.Anything).Return(nilo.Value(perm), nil)
 
 	user := model.User{
 		ID:        1,
@@ -81,7 +81,7 @@ func TestUserLogin(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	userRepo.On("FindByUsername", ctx, mock.Anything).Return(nilo.Some(user), nil)
+	userRepo.On("FindByUsername", ctx, mock.Anything).Return(nilo.Value(user), nil)
 
 	token, backendErr := userService.Login(ctx, username, password)
 

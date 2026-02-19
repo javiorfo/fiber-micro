@@ -23,5 +23,5 @@ func (m *MockPermissionRepository) FindByName(ctx context.Context, name string) 
 	if perm, ok := args.Get(0).(nilo.Option[model.Permission]); ok {
 		return perm, args.Error(1)
 	}
-	return nilo.None[model.Permission](), args.Error(1)
+	return nilo.Nil[model.Permission](), args.Error(1)
 }

@@ -87,14 +87,14 @@ func (repository *userRepository) FindByUsername(ctx context.Context, username s
 		Find(&userDB, "username = ?", username)
 
 	if err := result.Error; err != nil {
-		return nilo.None[model.User](), err
+		return nilo.Nil[model.User](), err
 	}
 
 	if result.RowsAffected == 0 {
-		return nilo.None[model.User](), nil
+		return nilo.Nil[model.User](), nil
 	}
 
 	user := userDB.Into()
 
-	return nilo.Some(user), nil
+	return nilo.Value(user), nil
 }

@@ -106,8 +106,8 @@ github.com/javiorfo/go-microservice-lib v0.0.0-20260104190516-b5223c5c2965 h1:O0
 github.com/javiorfo/go-microservice-lib v0.0.0-20260104190516-b5223c5c2965/go.mod h1:yS6Aj8vVLs7EDiPVGw2cwswm5lRs2Vs1vE5Dq0y9d9Q=
 github.com/javiorfo/gormen v0.3.0 h1:4zVRukUPv0sDnWCh/q9wY3Dlow6zzf0H/ZuZyzHBt48=
 github.com/javiorfo/gormen v0.3.0/go.mod h1:VXjKViaf8NhD8yjraUBIBelAf6LxxW9voSlsCkb4luU=
-github.com/javiorfo/nilo v1.2.0 h1:LZCZyeiUomrD01ECPd+PsOp9WF8gLLRpX/pPn1txF9I=
-github.com/javiorfo/nilo v1.2.0/go.mod h1:cJBBOCqyc+87XmxDyJrenoIfhUkjsb07RRyNZOMJe90=
+github.com/javiorfo/nilo v1.6.0 h1:jxRVUm67OfVMI7SNUIp1MJLxo9tqZ13x54+x4UT0TKg=
+github.com/javiorfo/nilo v1.6.0/go.mod h1:cJBBOCqyc+87XmxDyJrenoIfhUkjsb07RRyNZOMJe90=
 github.com/javiorfo/steams v1.5.0 h1:TfWx0yMqr8oPQxIyqEym1Qu8+6pXyo5Z4pSg+1cdP7I=
 github.com/javiorfo/steams v1.5.0/go.mod h1:Pg5i6X1459CyUir9E2eYeLlc3uJtKWTcyiaomEFqLYE=
 github.com/jinzhu/inflection v1.0.0 h1:K317FqzuhWc8YvSVlFMCCUb36O/S9MCKRDI7QkRKD/E=

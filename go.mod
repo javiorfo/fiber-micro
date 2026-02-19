@@ -9,7 +9,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/javiorfo/go-microservice-lib v0.0.0-20260104190516-b5223c5c2965
 	github.com/javiorfo/gormen v0.3.0
-	github.com/javiorfo/nilo v1.2.0
+	github.com/javiorfo/nilo v1.6.0
 	github.com/javiorfo/steams v1.5.0
 	github.com/joho/godotenv v1.5.1
 	github.com/stretchr/testify v1.10.0

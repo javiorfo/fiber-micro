@@ -28,7 +28,7 @@ func (m *MockUserRepository) FindByUsername(ctx context.Context, username string
 	if user, ok := args.Get(0).(nilo.Option[model.User]); ok {
 		return user, args.Error(1)
 	}
-	return nilo.None[model.User](), args.Error(1)
+	return nilo.Nil[model.User](), args.Error(1)
 }
 
 func (m *MockUserRepository) FindAll(ctx context.Context, pageable pagination.Pageable) (*pagination.Page[model.User], error) {

@@ -19,7 +19,7 @@ func (cur CreateUserRequest) Into(auditor string) model.User {
 	return model.User{
 		Username:  cur.Username,
 		Email:     cur.Email,
-		Info:      nilo.SomePtr(cur.Info),
+		Info:      nilo.Ptr(cur.Info),
 		Password:  cur.Password,
 		Status:    cur.Status,
 		CreatedBy: auditor,

@@ -40,7 +40,7 @@ func (service *userService) Create(ctx context.Context, user *model.User, permNa
 		return backend.InternalError(span, err)
 	}
 
-	perm, err := permissionOpt.OkOrElse(errors.PermissionNotFound(span))
+	perm, err := permissionOpt.OrError(errors.PermissionNotFound(span))
 	if err != nil {
 		return err
 	}
@@ -73,7 +73,7 @@ func (service *userService) Login(ctx context.Context, username string, password
 		return "", backend.InternalError(span, err)
 	}
 
-	user, err := userOpt.OkOrElse(errors.UserNotFound(span))
+	user, err := userOpt.OrError(errors.UserNotFound(span))
 	if err != nil {
 		return "", err
 	}

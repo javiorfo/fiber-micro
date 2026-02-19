@@ -12,7 +12,7 @@ import (
 	"github.com/javiorfo/go-microservice-lib/security"
 	"github.com/javiorfo/go-microservice-lib/tracing"
 	"github.com/javiorfo/gormen/pagination"
-	"github.com/javiorfo/steams"
+	"github.com/javiorfo/steams/v2"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -79,7 +79,7 @@ func (service *userService) Login(ctx context.Context, username string, password
 	}
 
 	if user.VerifyPassword(password) {
-		roles := steams.OfSlice(user.Permission.Roles).MapToString(func(r model.Role) string {
+		roles := steams.FromSlice(user.Permission.Roles).MapToString(func(r model.Role) string {
 			return r.Name
 		}).Collect()
 

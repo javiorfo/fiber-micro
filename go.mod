@@ -1,6 +1,6 @@
 module github.com/javiorfo/fiber-micro
 
-go 1.25.3
+go 1.26.0
 
 require (
 	github.com/gofiber/contrib/otelfiber v1.0.10

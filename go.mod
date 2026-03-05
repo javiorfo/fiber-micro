@@ -7,10 +7,10 @@ require (
 	github.com/gofiber/fiber/v2 v2.52.6
 	github.com/gofiber/swagger v1.1.1
 	github.com/google/uuid v1.6.0
-	github.com/javiorfo/go-microservice-lib v0.0.0-20260219183519-ab0612e1b722
+	github.com/javiorfo/go-microservice-lib v0.0.0-20260305154919-4da9ab41df06
 	github.com/javiorfo/gormen v0.3.0
-	github.com/javiorfo/nilo v1.6.0
-	github.com/javiorfo/steams/v2 v2.0.0
+	github.com/javiorfo/nilo v1.6.1
+	github.com/javiorfo/steams/v2 v2.0.1
 	github.com/joho/godotenv v1.5.1
 	github.com/stretchr/testify v1.10.0
 	github.com/swaggo/swag v1.16.4
